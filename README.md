@@ -7,9 +7,11 @@ joda-time
 WeatherUtils (https://github.com/a-urq/weather-utils-java)
 
 # How to use in your own Java projects
-Step 1: Enter your data into arrays of type `double[]` using SI units. Currently, the needed arrays are pressure, height, temperature, dewpoint, zonal (east-west) wind, and meridional (north-south) wind. Enter your data in the arrays in order of increasing pressure. The lowest pressure (highest altitude) record should be contained in the first index of each array and the highest pressure (lowest altitude) record should be contained in the last index.
+Step 1: Enter your data into arrays of type `double[]` using SI units. Currently, the needed arrays are pressure, height, temperature, dewpoint, zonal (east-west) wind, and meridional (north-south) wind. Vertical velocity may be included but is optional. Enter your data in the arrays in order of increasing pressure. The lowest pressure (highest altitude) record should be contained in the first index of each array and the highest pressure (lowest altitude) record should be contained in the last index.
 
-Take care not to use relative humidity in the dewpoint array. If you need, WeatherUtils.relativeHumidity(double temperature, double dewpoint) can convert your data. I will likely soon be adding vertical velocity.
+Take care not to use relative humidity in the dewpoint array. If you need, WeatherUtils.relativeHumidity(double temperature, double dewpoint) can convert your data.
+
+Vertical velocity uses pressure coordinates rather than vertical distance directly, in accordance with the conventions of display used in other visualizers such as SharpPY. Ensure that your data is in units of Pa s^-1 instead of m s^-1. Positive values should correspond with downward motion and negative values should correspond with upward motion.
 
 Step 2: Create a `Sounding` object using those arrays.
 
@@ -24,10 +26,11 @@ double[] temperature = new double[numRecords]; // Units: Kelvins
 double[] dewpoint = new double[numRecords]; // Units: Kelvins
 double[] uWind = new double[numRecords]; // Units: m s^-1
 double[] vWind = new double[numRecords]; // Units: m s^-1
+double[] omega = new double[numRecords]; // Units: Pa s^-1, may be omitted if data is not present
 
 // your code for entering the data into the arrays goes here
 
-Sounding sounding = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind);
+Sounding sounding = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind, omega);
 new SoundingFrame(sounding);
 ```
 
