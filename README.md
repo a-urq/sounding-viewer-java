@@ -3,6 +3,7 @@ A Java program that visualizes a vertical profile of the atmosphere as a skew-T 
 
 # Dependencies
 joda-time
+
 WeatherUtils (https://github.com/a-urq/weather-utils-java)
 
 # How to use in your own Java projects
