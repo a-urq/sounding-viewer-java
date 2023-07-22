@@ -15,7 +15,7 @@ Vertical velocity uses pressure coordinates rather than vertical distance direct
 
 Step 2: Create a `Sounding` object using those arrays.
 
-Step 3: Create a `Sounding Frame` object using that `Sounding` object and optionally additional information. This will show a window displaying the sounding chart.
+Step 3: Create a `SoundingFrame` object using that `Sounding` object and optionally additional information. This will show a window displaying the sounding chart.
 
 ```java
 int numRecords = ...; // Number of records in your sounding data.
