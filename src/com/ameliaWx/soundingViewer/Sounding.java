@@ -10,31 +10,22 @@ public class Sounding {
 	private double[] height;
 	private double[] uWind;
 	private double[] vWind;
-	
-	public Sounding(double[] pressureLevels, double[] temperature, double[] wetbulb, double[] dewpoint, double[] height,
+	private double[] wWind;
+
+	public Sounding(double[] pressureLevels, double[] temperature, double[] dewpoint, double[] height,
 			double[] uWind, double[] vWind) {
-		this.pressureLevels = pressureLevels;
-		this.temperature = temperature;
-		this.dewpoint = dewpoint;
-		this.height = height;
-		this.uWind = uWind;
-		this.vWind = vWind;
-		
-		wetbulb = new double[dewpoint.length];
-		
-		for(int i = 0; i < wetbulb.length; i++) {
-			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
-		}
+		this(pressureLevels, temperature, dewpoint, height, uWind, vWind, new double[0]);
 	}
 	
 	public Sounding(double[] pressureLevels, double[] temperature, double[] dewpoint, double[] height,
-			double[] uWind, double[] vWind) {
+			double[] uWind, double[] vWind, double[] wWind) {
 		this.pressureLevels = pressureLevels;
 		this.temperature = temperature;
 		this.dewpoint = dewpoint;
 		this.height = height;
 		this.uWind = uWind;
 		this.vWind = vWind;
+		this.wWind = wWind;
 		
 		wetbulb = new double[dewpoint.length];
 		
@@ -43,15 +34,26 @@ public class Sounding {
 		}
 	}
 	
-	public Sounding(float[] pressureLevels, float[] temperature, float[] wetbulb, float[] dewpoint, float[] height,
+	public Sounding(float[] pressureLevels, float[] temperature, float[] dewpoint, float[] height,
 			float[] uWind, float[] vWind) {
+		this(pressureLevels, temperature, dewpoint, height, uWind, vWind, new float[0]);
+	}
+	
+	public Sounding(float[] pressureLevels, float[] temperature, float[] dewpoint, float[] height,
+			float[] uWind, float[] vWind, float[] wWind) {
 		this.pressureLevels = convFloatToDouble(pressureLevels);
 		this.temperature = convFloatToDouble(temperature);
-		this.wetbulb = convFloatToDouble(wetbulb);
 		this.dewpoint = convFloatToDouble(dewpoint);
 		this.height = convFloatToDouble(height);
 		this.uWind = convFloatToDouble(uWind);
 		this.vWind = convFloatToDouble(vWind);
+		this.wWind = convFloatToDouble(wWind);
+		
+		wetbulb = new double[dewpoint.length];
+		
+		for(int i = 0; i < wetbulb.length; i++) {
+			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
+		}
 	}
 	
 	private double[] convFloatToDouble(float[] arr) {
@@ -90,5 +92,9 @@ public class Sounding {
 
 	public double[] getVWind() {
 		return vWind;
+	}
+
+	public double[] getWWind() {
+		return wWind;
 	}
 }

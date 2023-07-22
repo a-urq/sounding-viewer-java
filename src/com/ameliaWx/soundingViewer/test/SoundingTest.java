@@ -25,7 +25,7 @@ public class SoundingTest {
 			e.printStackTrace();
 		}
 		
-		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023051900-AMA.txt");
+		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023022703-OUN.txt");
 		Scanner sc = new Scanner(sounding);
 		
 		ArrayList<String> lines = new ArrayList<>();
@@ -83,8 +83,8 @@ public class SoundingTest {
 		}
 		
 		Sounding soundingObj = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind);
-		DateTime time = new DateTime(2023, 05, 19, 00, 0, DateTimeZone.UTC);
+		DateTime time = new DateTime(2023, 02, 27, 03, 0, DateTimeZone.UTC);
 		
-		new SoundingFrame("Amarillo TX Weather Balloon", soundingObj, time, 35.2331, -101.7092, 0, null);
+		new SoundingFrame("Norman OK Weather Balloon", soundingObj, time, 35.1808, -97.4378);
 	}
 }

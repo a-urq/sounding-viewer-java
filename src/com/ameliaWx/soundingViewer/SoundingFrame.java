@@ -1009,6 +1009,54 @@ public class SoundingFrame extends JFrame {
 				}
 			}
 
+			// omega pole
+			System.out.println("OMEGA POLE");
+			System.out.println(soundingM.getWWind().length);
+			if(soundingM.getWWind().length != 0) {
+				g.setStroke(thickStroke);
+				
+				double x1 = linScale(223.15, 323.15, 0, 800, 273.15 - 45);
+				
+				double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(10000));
+				double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(soundingM.getPressureLevels()[soundingM.getPressureLevels().length - 1]));
+
+				System.out.println(x1);
+				System.out.println(y1);
+				System.out.println(y2);
+				
+				g.drawLine((int) (x1 * scale), (int) (y1 * scale), (int) (x1 * scale), (int) (y2 * scale));
+				
+				for(int i = 0; i < soundingM.getWWind().length; i++) {
+					double pressureW = soundingM.getPressureLevels()[i];
+					double omegaW = soundingM.getWWind()[i];
+					
+					double yW = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(pressureW));
+					
+					double x2 = x1 + linScale(0, -1, 0, 40, omegaW);
+					
+					if(omegaW > 1.0) {
+						g.setColor(new Color(96, 64, 150));
+					} else if(omegaW > 0.25) {
+						g.setColor(new Color(128, 128, 255));
+					} else if(omegaW > 0) {
+						g.setColor(new Color(128, 255, 192));
+					} else if(omegaW > -0.25) {
+						g.setColor(new Color(255, 192, 64));
+					} else if(omegaW > -1.0) {
+						g.setColor(new Color(255, 0, 0));
+					} else {
+						g.setColor(new Color(255, 128, 255));
+					}
+					
+//					System.out.println(pressureW + " Pa");
+//					System.out.println(omegaW + " Pa s^-1");
+//					System.out.println(x2 - x1);
+//					System.out.println();
+					
+					g.drawLine((int) (x1 * scale), (int) (yW * scale), (int) (x2 * scale), (int) (yW * scale));
+				}
+			}
+			
 			return skewT;
 		}
 
