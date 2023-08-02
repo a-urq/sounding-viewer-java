@@ -25,7 +25,7 @@ public class SoundingTest {
 			e.printStackTrace();
 		}
 		
-		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023022703-OUN.txt");
+		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2022020312-FWD.txt");
 		Scanner sc = new Scanner(sounding);
 		
 		ArrayList<String> lines = new ArrayList<>();
@@ -83,7 +83,7 @@ public class SoundingTest {
 		}
 		
 		Sounding soundingObj = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind);
-		DateTime time = new DateTime(2023, 02, 27, 03, 0, DateTimeZone.UTC);
+		DateTime time = new DateTime(2023, 02, 27, 3, 0, DateTimeZone.UTC);
 		
 		new SoundingFrame("Norman OK Weather Balloon", soundingObj, time, 35.1808, -97.4378);
 	}
