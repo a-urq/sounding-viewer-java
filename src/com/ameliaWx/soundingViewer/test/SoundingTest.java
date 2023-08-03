@@ -25,7 +25,7 @@ public class SoundingTest {
 			e.printStackTrace();
 		}
 		
-		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2022020312-FWD.txt");
+		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023022703-OUN.txt");
 		Scanner sc = new Scanner(sounding);
 		
 		ArrayList<String> lines = new ArrayList<>();

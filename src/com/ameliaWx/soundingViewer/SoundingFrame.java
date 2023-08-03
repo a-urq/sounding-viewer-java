@@ -1845,11 +1845,8 @@ public class SoundingFrame extends JFrame {
 
 				double streamwiseness = vortNormU * stormInflowNormU + vortNormV * stormInflowNormV;
 
-				// negative if LM, positive otherwise
-				int mesocycloneSign = (stormMotionVector == 0) ? -1 : 1;
-
 				totalVorticity[i] = Math.hypot(vortU, vortV);
-				streamwiseVorticity[i] = totalVorticity[i] * mesocycloneSign * streamwiseness;
+				streamwiseVorticity[i] = totalVorticity[i] * streamwiseness;
 			}
 
 			double totalVorticityMaxTick = 0.0;
@@ -1897,7 +1894,7 @@ public class SoundingFrame extends JFrame {
 
 				g.drawLine((int) (x1 * scale), (int) (y1 * scale), (int) (x2 * scale), (int) (y2 * scale));
 			}
-			drawRightAlignedString("TOTAL HORIZ. VORT.", g, (int) (182.5 * scale), (int) (30 * scale));
+			drawRightAlignedString("TOTAL HORIZ. VORT.", g, (int) (182.5 * scale), (int) (45 * scale));
 
 			// draw streamwise vorticity trace
 			g.setColor(new Color(255, 0, 0));
@@ -1910,6 +1907,18 @@ public class SoundingFrame extends JFrame {
 				g.drawLine((int) (x1 * scale), (int) (y1 * scale), (int) (x2 * scale), (int) (y2 * scale));
 			}
 			drawRightAlignedString("STREAMWISE VORT.", g, (int) (182.5 * scale), (int) (15 * scale));
+
+			// draw anti-streamwise vorticity trace
+			g.setColor(new Color(64, 64, 255));
+			for (int i = 0; i < streamwiseVorticity.length - 1; i++) {
+				double x1 = linScale(0, totalVorticityMaxTick, 0, 187.5, -streamwiseVorticity[i]);
+				double x2 = linScale(0, totalVorticityMaxTick, 0, 187.5, -streamwiseVorticity[i + 1]);
+				double y1 = linScale(0, 3000, 175, 0, height[i] - height[height.length - 1]);
+				double y2 = linScale(0, 3000, 175, 0, height[i + 1] - height[height.length - 1]);
+
+				g.drawLine((int) (x1 * scale), (int) (y1 * scale), (int) (x2 * scale), (int) (y2 * scale));
+			}
+			drawRightAlignedString("ANTISTREAMWISE VORT.", g, (int) (182.5 * scale), (int) (30 * scale));
 
 			// draw y axis ticks
 			g.setColor(Color.WHITE);
