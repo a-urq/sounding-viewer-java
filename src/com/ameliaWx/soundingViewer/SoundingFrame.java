@@ -1256,25 +1256,27 @@ public class SoundingFrame extends JFrame {
 
 			drawCenteredOutlinedString("DTM", g, (int) (xDtm * scale), (int) (yDtm * scale), new Color(255, 128, 255));
 
-			double eWindUp = Math.cos(-windOffsetAngle) * corfidiUpshear[0]
-					- Math.sin(-windOffsetAngle) * corfidiUpshear[1];
-			double nWindUp = Math.sin(-windOffsetAngle) * corfidiUpshear[0]
-					+ Math.cos(-windOffsetAngle) * corfidiUpshear[1];
-
-			double xUp = linScale(-maxRadius, maxRadius, 0, 400, eWindUp);
-			double yUp = linScale(-maxRadius, maxRadius, 0, 400, -nWindUp);
-
-			drawCenteredOutlinedString("UP", g, (int) (xUp * scale), (int) (yUp * scale), new Color(192, 192, 192));
-
-			double eWindDn = Math.cos(-windOffsetAngle) * corfidiDownshear[0]
-					- Math.sin(-windOffsetAngle) * corfidiDownshear[1];
-			double nWindDn = Math.sin(-windOffsetAngle) * corfidiDownshear[0]
-					+ Math.cos(-windOffsetAngle) * corfidiDownshear[1];
-
-			double xDn = linScale(-maxRadius, maxRadius, 0, 400, eWindDn);
-			double yDn = linScale(-maxRadius, maxRadius, 0, 400, -nWindDn);
-
-			drawCenteredOutlinedString("DN", g, (int) (xDn * scale), (int) (yDn * scale), new Color(192, 192, 192));
+			if(mucape[activeReadoutSet] > 0) {
+				double eWindUp = Math.cos(-windOffsetAngle) * corfidiUpshear[0]
+						- Math.sin(-windOffsetAngle) * corfidiUpshear[1];
+				double nWindUp = Math.sin(-windOffsetAngle) * corfidiUpshear[0]
+						+ Math.cos(-windOffsetAngle) * corfidiUpshear[1];
+	
+				double xUp = linScale(-maxRadius, maxRadius, 0, 400, eWindUp);
+				double yUp = linScale(-maxRadius, maxRadius, 0, 400, -nWindUp);
+	
+				drawCenteredOutlinedString("UP", g, (int) (xUp * scale), (int) (yUp * scale), new Color(192, 192, 192));
+	
+				double eWindDn = Math.cos(-windOffsetAngle) * corfidiDownshear[0]
+						- Math.sin(-windOffsetAngle) * corfidiDownshear[1];
+				double nWindDn = Math.sin(-windOffsetAngle) * corfidiDownshear[0]
+						+ Math.cos(-windOffsetAngle) * corfidiDownshear[1];
+	
+				double xDn = linScale(-maxRadius, maxRadius, 0, 400, eWindDn);
+				double yDn = linScale(-maxRadius, maxRadius, 0, 400, -nWindDn);
+	
+				drawCenteredOutlinedString("DN", g, (int) (xDn * scale), (int) (yDn * scale), new Color(192, 192, 192));
+			}
 
 			// trace
 //			System.out.println(windOffsetAngle);
@@ -2157,7 +2159,7 @@ public class SoundingFrame extends JFrame {
 				} else if (z_ < 12000) {
 					g.setColor(new Color(128, 192, 255));
 				} else {
-					g.setColor(new Color(128, 0, 128));
+					g.setColor(new Color(192, 0, 192));
 				}
 //				g.drawLine((int) (xCurr * scale), (int) (yCurr * scale), (int) (xPrev * scale), (int) (yPrev * scale));
 
