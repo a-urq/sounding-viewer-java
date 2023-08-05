@@ -56,4 +56,5 @@ new SoundingFrame("Amarillo TX Weather Balloon", sounding, time, 35.2331, -101.7
 
 I have also made a MapInset interface that allows for a map to be shown in the upper-rightmost frame. RadarView uses it to display radar data near the sounding to give context for the storm's environment. I plan to write a guide on how to use that interface later on.
 
-![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/034994f7-5952-470c-a72c-bf3367d174dd)
+![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/c3752d74-35af-473c-9182-737f31c87b67)
+
