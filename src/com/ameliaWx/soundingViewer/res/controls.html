@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>RadarView Help Page</title>
+        <style>
+            html{
+                font-family: sans-serif;
+            }
+            .version {
+                font-size: small;
+            }
+            .serif {
+                font-family: serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Sounding Viewer Controls Page</h1>
+        <p class="version"><i>Made by Amelia Urquhart</i></p>
+
+        <h2>Controls</h2>
+        <table>
+            <tr>
+                <th>Control</th>
+                <th>What it does</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>If two soundings from different times are loaded up in the viewer, displays the earlier of the two uninterpolated soundings.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>If two soundings from different times are loaded up in the viewer, displays the time-interpolated sounding.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>If two soundings from different times are loaded up in the viewer, displays the later of the two uninterpolated soundings.</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>Shows this page.</td>
+            </tr>
+            <tr>
+                <td>P</td>
+                <td>Shows a dialog where the user can choose the convective parcel path displayed on the Skew-T diagram.</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>Shows a dialog where the users can choose the storm motion vector used for kinematics calculations.</td>
+            </tr>
+        </table>
+
+        <h2>Parcel Path Options</h2>
+        <h3>Surface Based</h3>
+        <p><b>When to use:</b> Surface based storms. May be useful in assessing tornado potential in surface based supercells.</p>
+        <p><b>How it's calculated:</b> Sets the pressure, temperature, and dewpoint of the starting point to that of the environmental air at the surface.</p>
+        <h3>Mixed Layer (50 mb)</h3>
+        <p><b>When to use:</b> Surface based storms. May be most useful in storms with shallow inflow layers.</p>
+        <p><b>How it's calculated:</b> Computes the average potential temperature and mixing ratio in the lowest 50 mb of the atmosphere. Sets the pressure of the starting point to that of the surface air. Computes the parcel temperature using the average potential temperature and surface pressure and the parcel dewpoint using the average mixing ratio and surface pressure.</p>
+        <h3>Mixed Layer (100 mb)</h3>
+        <p><b>When to use:</b> Surface based storms. May be most useful in storms with deep inflow layers.</p>
+        <p><b>How it's calculated:</b> Computes the average potential temperature and mixing ratio in the lowest 100 mb of the atmosphere. Sets the pressure of the starting point to that of the surface air. Computes the parcel temperature using the average potential temperature and surface pressure and the parcel dewpoint using the average mixing ratio and surface pressure.</p>
+        <h3>Most Unstable</h3>
+        <p><b>When to use:</b> Elevated storms.</p>
+        <p><b>How it's calculated:</b> Finds the pressure level with the highest Theta-E (equivalent potential temperature). Sets the pressure, temperature, and dewpoint to the environmental air at that level.</p>
+
+        <h2>Storm Motion Vector Options</h2>
+        <h3>Left Moving</h3>
+        <p><b>When to use:</b> Supercells with clockwise-rotating mesocyclones.</p>
+        <p><b>How it's calculated:</b> Uses the Left Moving storm motion vector as calculated by <a href="https://www.e-education.psu.edu/files/meteo361/image/Section8/bunkersetal0708.pdf">Bunkers et. al. (2000)</a>.</p>
+        <h3>Mean Wind</h3>
+        <p><b>When to use:</b> Non-supercellular storms.</p>
+        <p><b>How it's calculated:</b> The non-weighted average of the wind from the surface to a 6 km altitude.</p>
+        <h3>Right Moving</h3>
+        <p><b>When to use:</b> Supercells with counterclockwise-rotating mesocyclones. Most supercells in the Northern Hemisphere are like this.</p>
+        <p><b>How it's calculated:</b> Uses the Right Moving storm motion vector as calculated by <a href="https://www.e-education.psu.edu/files/meteo361/image/Section8/bunkersetal0708.pdf">Bunkers et. al. (2000)</a>.</p>
+        <h3>Corfidi Upshear</h3>
+        <p><b>When to use:</b> Backbuilding Mesoscale Convective Systems.</p>
+        <p><b>How it's calculated:</b> Uses the Upwind-Propagating vector as calculated by <a href="https://www.spc.noaa.gov/publications/corfidi/mcs2003.pdf">Corfidi 2003</a>.</p>
+        <h3>Corfidi Downshear</h3>
+        <p><b>When to use:</b> Cold pool propagated Mesoscale Convective Systems (bow echoes).</p>
+        <p><b>How it's calculated:</b> Uses the Downwind-Propagating vector as calculated by <a href="https://www.spc.noaa.gov/publications/corfidi/mcs2003.pdf">Corfidi 2003</a>.</p>
+    </body>
+</html>

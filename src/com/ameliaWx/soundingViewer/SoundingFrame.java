@@ -15,6 +15,7 @@ import static com.ameliaWx.soundingViewer.HazType.TOR;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -22,6 +23,12 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,6 +36,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 
 import com.ameliaWx.weatherUtils.ParcelPath;
@@ -39,6 +47,8 @@ import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class SoundingFrame extends JFrame {
 	private static final long serialVersionUID = 396540838404275479L;
+
+	public static String dataFolder = System.getProperty("user.home") + "/Documents/SoundingViewer/data/";
 
 	private String soundingSource;
 
@@ -571,6 +581,7 @@ public class SoundingFrame extends JFrame {
 			g2d.drawImage(chart, (width - chart.getWidth()) / 2, (height - chart.getHeight()) / 2, null);
 		}
 
+		private static final String AUTHOR_MESSAGE = "MADE BY AMELIA URQUHART | PRESS 'C' FOR CONTROLS";
 		private BufferedImage drawSoundingChart(int width, int height) {
 			double scaleW = width / 1750.0;
 			double scaleH = height / 900.0;
@@ -688,9 +699,12 @@ public class SoundingFrame extends JFrame {
 						g.setFont(normalFont);
 					}
 
-					drawCenteredString(timeString(time), g, (int) ((1700 * scale * (i + 1)) / 4), (int) (25 * scale));
+					drawCenteredString(timeString(time), g, (int) ((1750 * scale * (i + 1)) / 4), (int) (25 * scale));
 				}
 			}
+
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (12 * scale)));
+			drawCenteredString(AUTHOR_MESSAGE, g, (int) (1750 * scale / 2), (int) (890 * scale));
 
 			return chart;
 		}
@@ -1447,7 +1461,7 @@ public class SoundingFrame extends JFrame {
 			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (12 * scale)));
 
 //			System.out.println("MU-LPP: " + muLplPressure);                        
-//			System.out.println("MU-LPL: " + muLpl);
+//			System.out.println("MU-LPL: " + muLpl[activeReadoutSet]);
 			g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML-50MB", "ML-100MB", "MU"),
 					(int) (45 * scale), (int) (15 * scale));
 			g.drawString(String.format("%-9s%-9d%-9d%-9d%-9d", "CAPE", (int) sbcape[activeReadoutSet],
@@ -2310,6 +2324,9 @@ public class SoundingFrame extends JFrame {
 					g.repaint();
 				}
 				break;
+			case KeyEvent.VK_C:
+				openControlsPage();
+				break;
 			case KeyEvent.VK_P:
 				selectParcelPathType();
 				g.repaint();
@@ -2688,6 +2705,36 @@ public class SoundingFrame extends JFrame {
 		g.drawString(s, x, y + (fm.getAscent() - ht / 2));
 	}
 
+	public static File loadResourceAsFile(String urlStr) {
+		File dataDir = new File(dataFolder + "temp/");
+		dataDir.mkdirs();
+		
+		System.out.println(urlStr);
+		URL url = SoundingFrame.class.getResource(urlStr);
+		InputStream is = SoundingFrame.class.getResourceAsStream(urlStr);
+		System.out.println(url);
+		System.out.println(is);
+		URL tilesObj = url;
+
+		File file = new File(dataFolder + "temp/" + urlStr + "");
+		file.deleteOnExit();
+
+		if (tilesObj == null) {
+			System.out.println("Loading failed to start.");
+			return null;
+		}
+
+		try {
+			FileUtils.copyURLToFile(tilesObj, file);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+
+		return file;
+	}
+
 	private double linScale(double preMin, double preMax, double postMin, double postMax, double value) {
 		double slope = (postMax - postMin) / (preMax - preMin);
 
@@ -2811,5 +2858,21 @@ public class SoundingFrame extends JFrame {
 		double magnitude = Math.hypot(vector[0], vector[1]) / 0.5144444;
 
 		return String.format("%3d/%02d", (int) direction, (int) Math.round(magnitude));
+	}
+
+	private void openControlsPage() {
+		loadResourceAsFile("res/controls.html");
+
+		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+			try {
+				Desktop.getDesktop().browse(new URI("file:///" + dataFolder + "temp/res/controls.html"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
