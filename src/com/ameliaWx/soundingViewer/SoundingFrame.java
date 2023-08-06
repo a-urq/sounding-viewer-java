@@ -208,19 +208,19 @@ public class SoundingFrame extends JFrame {
 
 		ptypeNames.put(PrecipitationType.VERY_DRY_SNOW, "Very Dry Snow");
 		ptypeColors.put(PrecipitationType.VERY_DRY_SNOW, new Color(192, 255, 255));
-		
+
 		ptypeNames.put(PrecipitationType.FRZR_ICEP_MIX, "ZR/IP Mix");
 		ptypeColors.put(PrecipitationType.FRZR_ICEP_MIX, new Color(255, 75, 255));
-		
+
 		ptypeNames.put(PrecipitationType.FRZR_SNOW_MIX, "ZR/SN Mix");
 		ptypeColors.put(PrecipitationType.FRZR_SNOW_MIX, new Color(194, 123, 123));
-		
+
 		ptypeNames.put(PrecipitationType.ICEP_SNOW_MIX, "IP/SN Mix");
 		ptypeColors.put(PrecipitationType.ICEP_SNOW_MIX, new Color(255, 128, 0));
-		
+
 		ptypeNames.put(PrecipitationType.RAIN_ICEP_MIX, "RN/IP Mix");
 		ptypeColors.put(PrecipitationType.RAIN_ICEP_MIX, new Color(203, 173, 153));
-		
+
 		ptypeNames.put(PrecipitationType.RAIN_SNOW_MIX, "RN/SN Mix");
 		ptypeColors.put(PrecipitationType.RAIN_SNOW_MIX, new Color(153, 173, 203));
 	}
@@ -582,6 +582,7 @@ public class SoundingFrame extends JFrame {
 		}
 
 		private static final String AUTHOR_MESSAGE = "MADE BY AMELIA URQUHART | PRESS 'C' FOR CONTROLS";
+
 		private BufferedImage drawSoundingChart(int width, int height) {
 			double scaleW = width / 1750.0;
 			double scaleH = height / 900.0;
@@ -1270,25 +1271,25 @@ public class SoundingFrame extends JFrame {
 
 			drawCenteredOutlinedString("DTM", g, (int) (xDtm * scale), (int) (yDtm * scale), new Color(255, 128, 255));
 
-			if(mucape[activeReadoutSet] > 0) {
+			if (mucape[activeReadoutSet] > 0) {
 				double eWindUp = Math.cos(-windOffsetAngle) * corfidiUpshear[0]
 						- Math.sin(-windOffsetAngle) * corfidiUpshear[1];
 				double nWindUp = Math.sin(-windOffsetAngle) * corfidiUpshear[0]
 						+ Math.cos(-windOffsetAngle) * corfidiUpshear[1];
-	
+
 				double xUp = linScale(-maxRadius, maxRadius, 0, 400, eWindUp);
 				double yUp = linScale(-maxRadius, maxRadius, 0, 400, -nWindUp);
-	
+
 				drawCenteredOutlinedString("UP", g, (int) (xUp * scale), (int) (yUp * scale), new Color(192, 192, 192));
-	
+
 				double eWindDn = Math.cos(-windOffsetAngle) * corfidiDownshear[0]
 						- Math.sin(-windOffsetAngle) * corfidiDownshear[1];
 				double nWindDn = Math.sin(-windOffsetAngle) * corfidiDownshear[0]
 						+ Math.cos(-windOffsetAngle) * corfidiDownshear[1];
-	
+
 				double xDn = linScale(-maxRadius, maxRadius, 0, 400, eWindDn);
 				double yDn = linScale(-maxRadius, maxRadius, 0, 400, -nWindDn);
-	
+
 				drawCenteredOutlinedString("DN", g, (int) (xDn * scale), (int) (yDn * scale), new Color(192, 192, 192));
 			}
 
@@ -1723,19 +1724,19 @@ public class SoundingFrame extends JFrame {
 
 			PrecipitationType cantin = cantinBachand[activeReadoutSet];
 			g.setColor(ptypeColors.get(cantin));
-			g.drawString(String.format("%-11s", ptypeNames.get(cantin)).toUpperCase(),
-					(int) (5 * scale) + ptypeOffset, (int) (110 * scale));
-			
+			g.drawString(String.format("%-11s", ptypeNames.get(cantin)).toUpperCase(), (int) (5 * scale) + ptypeOffset,
+					(int) (110 * scale));
+
 			PrecipitationType rmr = ramer[activeReadoutSet];
 			g.setColor(ptypeColors.get(rmr));
-			g.drawString(String.format("%-11s", ptypeNames.get(rmr)).toUpperCase(),
-					(int) (5 * scale) + ptypeOffset, (int) (125 * scale));
-			
+			g.drawString(String.format("%-11s", ptypeNames.get(rmr)).toUpperCase(), (int) (5 * scale) + ptypeOffset,
+					(int) (125 * scale));
+
 			PrecipitationType brgn = bourgouin[activeReadoutSet];
 			g.setColor(ptypeColors.get(brgn));
-			g.drawString(String.format("%-11s", ptypeNames.get(brgn)).toUpperCase(),
-					(int) (5 * scale) + ptypeOffset, (int) (140 * scale));
-			
+			g.drawString(String.format("%-11s", ptypeNames.get(brgn)).toUpperCase(), (int) (5 * scale) + ptypeOffset,
+					(int) (140 * scale));
+
 			PrecipitationType bgRevised = bourgouinRevised[activeReadoutSet];
 			g.setColor(ptypeColors.get(bgRevised));
 			g.drawString(String.format("%-11s", ptypeNames.get(bgRevised)).toUpperCase(),
@@ -1745,7 +1746,7 @@ public class SoundingFrame extends JFrame {
 			g.setColor(ptypeColors.get(bgRevExt));
 			g.drawString(String.format("%-11s", ptypeNames.get(bgRevExt)).toUpperCase(),
 					(int) (5 * scale) + ptypeOffset, (int) (170 * scale));
-			
+
 //			System.out.println(cantin);
 //			System.out.println(rmr);
 //			System.out.println(brgn);
@@ -2708,7 +2709,7 @@ public class SoundingFrame extends JFrame {
 	public static File loadResourceAsFile(String urlStr) {
 		File dataDir = new File(dataFolder + "temp/");
 		dataDir.mkdirs();
-		
+
 		System.out.println(urlStr);
 		URL url = SoundingFrame.class.getResource(urlStr);
 		InputStream is = SoundingFrame.class.getResourceAsStream(urlStr);
@@ -2863,9 +2864,17 @@ public class SoundingFrame extends JFrame {
 	private void openControlsPage() {
 		loadResourceAsFile("res/controls.html");
 
+		StringBuilder dataFolderURI = new StringBuilder(dataFolder);
+
+		for (int i = 0; i < dataFolderURI.length(); i++) {
+			if (dataFolderURI.charAt(i) == '\\') {
+				dataFolderURI.setCharAt(i, '/');
+			}
+		}
+
 		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 			try {
-				Desktop.getDesktop().browse(new URI("file:///" + dataFolder + "temp/res/controls.html"));
+				Desktop.getDesktop().browse(new URI("file:///" + dataFolderURI.toString() + "temp/res/controls.html"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
