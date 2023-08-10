@@ -29,6 +29,7 @@ double[] vWind = new double[numRecords]; // Units: m s^-1
 double[] omega = new double[numRecords]; // Units: Pa s^-1, may be omitted if data is not present
 
 // your code for entering the data into the arrays goes here
+// remember to enter the lowest pressure (highest altitude) data in the first index and the highest pressure (lowest altitude) data in the last index.
 
 Sounding sounding = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind, omega);
 new SoundingFrame(sounding);
