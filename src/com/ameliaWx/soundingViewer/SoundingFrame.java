@@ -579,7 +579,7 @@ public class SoundingFrame extends JFrame {
 				omega0_3[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
 						activeSounding.getWWind(), 0, 3000);
 				omegaCap[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
-						activeSounding.getWWind(), 0, ml100Lcl[i]);
+						activeSounding.getWWind(), 0, ml100Lfc[i]);
 				omegaInflow[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
 						activeSounding.getWWind(), inflowLayer[i][0], inflowLayer[i][1]);
 
@@ -1982,6 +1982,18 @@ public class SoundingFrame extends JFrame {
 //			System.out.println(brgn);
 //			System.out.println(bgRevised);
 //			System.out.println(bgRevExt);
+			
+//			g.setColor(new Color(192, 192, 192));
+//			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (9 * scale)));
+//			double surfacePressure = activeSounding.getPressureLevels()[activeSounding.getPressureLevels().length - 1];
+//			double surfaceHeight = activeSounding.getHeight()[activeSounding.getHeight().length - 1];
+//			double meltingEnergy = PtypeAlgorithms.meltingEnergy(activeSounding.getPressureLevels(),
+//					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
+//					surfacePressure, surfaceHeight);
+//			double refreezingEnergy = PtypeAlgorithms.refreezingEnergy(activeSounding.getPressureLevels(),
+//					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
+//					surfacePressure, surfaceHeight);
+//			g.drawString(String.format("%04.0fM/%04.0fF", meltingEnergy, refreezingEnergy), (int) (5 * scale), (int) (85 * scale));
 
 			return winterReadouts;
 		}
