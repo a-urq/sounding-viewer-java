@@ -64,7 +64,7 @@ public class SoundingFrame extends JFrame {
 
 	private double windOffsetAngle; // corrects for U and V not matching up with east and north, radians
 
-	private ParcelPath pathType = ParcelPath.MIXED_LAYER_100MB;
+	private ParcelPath pathType = ParcelPath.INFLOW_LAYER;
 	
 	private boolean showEntrainment = false;
 
@@ -72,20 +72,20 @@ public class SoundingFrame extends JFrame {
 	@SuppressWarnings("unchecked")
 	private ArrayList<RecordAtLevel>[] parcelPathSurfaceBased = new ArrayList[3];
 	@SuppressWarnings("unchecked")
-	private ArrayList<RecordAtLevel>[] parcelPathMixedLayer50Mb = new ArrayList[3];
-	@SuppressWarnings("unchecked")
-	private ArrayList<RecordAtLevel>[] parcelPathMixedLayer100Mb = new ArrayList[3];
+	private ArrayList<RecordAtLevel>[] parcelPathMixedLayer = new ArrayList[3];
 	@SuppressWarnings("unchecked")
 	private ArrayList<RecordAtLevel>[] parcelPathMostUnstable = new ArrayList[3];
+	@SuppressWarnings("unchecked")
+	private ArrayList<RecordAtLevel>[] parcelPathInflowLayer = new ArrayList[3];
 	
 	@SuppressWarnings("unchecked")
 	private ArrayList<RecordAtLevel>[] parcelPathSurfaceBasedEntr = new ArrayList[3];
 	@SuppressWarnings("unchecked")
-	private ArrayList<RecordAtLevel>[] parcelPathMixedLayer50MbEntr = new ArrayList[3];
-	@SuppressWarnings("unchecked")
-	private ArrayList<RecordAtLevel>[] parcelPathMixedLayer100MbEntr = new ArrayList[3];
+	private ArrayList<RecordAtLevel>[] parcelPathMixedLayerEntr = new ArrayList[3];
 	@SuppressWarnings("unchecked")
 	private ArrayList<RecordAtLevel>[] parcelPathMostUnstableEntr = new ArrayList[3];
+	@SuppressWarnings("unchecked")
+	private ArrayList<RecordAtLevel>[] parcelPathInflowLayerEntr = new ArrayList[3];
 
 	@SuppressWarnings("unchecked")
 	private ArrayList<RecordAtLevel>[] parcelPathDowndraft = new ArrayList[3];
@@ -93,64 +93,64 @@ public class SoundingFrame extends JFrame {
 	// readout parameters (write once read many) (0=sounding0, 1=soundingM,
 	// 2=sounding1)
 	private double[] sbcape = new double[3];
-	private double[] ml50cape = new double[3];
-	private double[] ml100cape = new double[3];
+	private double[] ilcape = new double[3];
+	private double[] mlcape = new double[3];
 	private double[] mucape = new double[3];
 
 	private double[] sbcinh = new double[3];
-	private double[] ml50cinh = new double[3];
-	private double[] ml100cinh = new double[3];
+	private double[] mlcinh = new double[3];
 	private double[] mucinh = new double[3];
+	private double[] ilcinh = new double[3];
 
 	private double[] sbLcl = new double[3];
-	private double[] ml50Lcl = new double[3];
-	private double[] ml100Lcl = new double[3];
+	private double[] mlLcl = new double[3];
 	private double[] muLcl = new double[3];
+	private double[] ilLcl = new double[3];
 
 	private double[] sbCcl = new double[3];
-	private double[] ml50Ccl = new double[3];
-	private double[] ml100Ccl = new double[3];
+	private double[] mlCcl = new double[3];
 	private double[] muCcl = new double[3];
+	private double[] ilCcl = new double[3];
 
 	private double[] sbLfc = new double[3];
-	private double[] ml50Lfc = new double[3];
-	private double[] ml100Lfc = new double[3];
+	private double[] mlLfc = new double[3];
 	private double[] muLfc = new double[3];
+	private double[] ilLfc = new double[3];
 
 	private double[] sbEl = new double[3];
-	private double[] ml50El = new double[3];
-	private double[] ml100El = new double[3];
+	private double[] mlEl = new double[3];
 	private double[] muEl = new double[3];
+	private double[] ilEl = new double[3];
 	
 	private double[] sbecape = new double[3];
-	private double[] ml50ecape = new double[3];
-	private double[] ml100ecape = new double[3];
+	private double[] mlecape = new double[3];
 	private double[] muecape = new double[3];
+	private double[] ilecape = new double[3];
 
 	private double[] sbecinh = new double[3];
-	private double[] ml50ecinh = new double[3];
-	private double[] ml100ecinh = new double[3];
+	private double[] mlecinh = new double[3];
 	private double[] muecinh = new double[3];
+	private double[] ilecinh = new double[3];
 
 	private double[] sbELcl = new double[3];
-	private double[] ml50ELcl = new double[3];
-	private double[] ml100ELcl = new double[3];
+	private double[] mlELcl = new double[3];
 	private double[] muELcl = new double[3];
+	private double[] ilELcl = new double[3];
 
 	private double[] sbECcl = new double[3];
-	private double[] ml50ECcl = new double[3];
-	private double[] ml100ECcl = new double[3];
+	private double[] mlECcl = new double[3];
 	private double[] muECcl = new double[3];
+	private double[] ilECcl = new double[3];
 
 	private double[] sbELfc = new double[3];
-	private double[] ml50ELfc = new double[3];
-	private double[] ml100ELfc = new double[3];
+	private double[] mlELfc = new double[3];
 	private double[] muELfc = new double[3];
+	private double[] ilELfc = new double[3];
 
 	private double[] sbEEl = new double[3];
-	private double[] ml50EEl = new double[3];
-	private double[] ml100EEl = new double[3];
+	private double[] mlEEl = new double[3];
 	private double[] muEEl = new double[3];
+	private double[] ilEEl = new double[3];
 
 	private double[] muLpl = new double[3];
 
@@ -280,6 +280,7 @@ public class SoundingFrame extends JFrame {
 
 		this.setSize(1750, 900);
 		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		this.setTitle(generateTitle(this.timeM));
 
@@ -334,25 +335,27 @@ public class SoundingFrame extends JFrame {
 
 				parcelPathSurfaceBased[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.SURFACE_BASED, false);
-				parcelPathMixedLayer50Mb[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_50MB,
-						false);
-				parcelPathMixedLayer100Mb[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
+				parcelPathMixedLayer[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_100MB,
 						false);
 				parcelPathMostUnstable[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MOST_UNSTABLE, false);
+				parcelPathInflowLayer[i] = WeatherUtils.computeInflowLayerParcelPath(activeSounding.getPressureLevels(),
+						activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(),
+						false);
 
 				parcelPathSurfaceBasedEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.SURFACE_BASED, true);
-				parcelPathMixedLayer50MbEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_50MB,
-						true);
-				parcelPathMixedLayer100MbEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
+				parcelPathMixedLayerEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_100MB,
 						true);
 				parcelPathMostUnstableEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MOST_UNSTABLE, true);
+				parcelPathInflowLayerEntr[i] = WeatherUtils.computeInflowLayerParcelPath(activeSounding.getPressureLevels(),
+						activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(),
+						true);
 
 				parcelPathDowndraft[i] = WeatherUtils.computeDcapeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint());
@@ -373,101 +376,101 @@ public class SoundingFrame extends JFrame {
 
 				sbcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ml50cape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50Mb[i]);
-				ml100cape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100Mb[i]);
+				mlcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				mucape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
 
 				sbcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ml50cinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50Mb[i]);
-				ml100cinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100Mb[i]);
+				mlcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				mucinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
 
 				sbLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathSurfaceBased[i]);
-				ml50Lcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer50Mb[i]);
-				ml100Lcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer100Mb[i]);
+				ilLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathInflowLayer[i]);
+				mlLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer[i]);
 				muLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMostUnstable[i]);
 
 				sbCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ml50Ccl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50Mb[i]);
-				ml100Ccl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100Mb[i]);
+				ilCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+				mlCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				muCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
 
 				sbLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ml50Lfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50Mb[i]);
-				ml100Lfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100Mb[i]);
+				mlLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				muLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
 
 				sbEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ml50El[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50Mb[i]);
-				ml100El[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100Mb[i]);
+				ilEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+				mlEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				muEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
 
 				sbecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ml50ecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50MbEntr[i]);
-				ml100ecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100MbEntr[i]);
+				ilecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				sbecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ml50ecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50MbEntr[i]);
-				ml100ecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100MbEntr[i]);
+				ilecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				sbELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathSurfaceBasedEntr[i]);
-				ml50ELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer50MbEntr[i]);
-				ml100ELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer100MbEntr[i]);
+				ilELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathInflowLayerEntr[i]);
+				mlELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayerEntr[i]);
 				muELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMostUnstableEntr[i]);
 
 				sbECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ml50ECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50MbEntr[i]);
-				ml100ECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100MbEntr[i]);
+				ilECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				sbELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ml50ELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50MbEntr[i]);
-				ml100ELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100MbEntr[i]);
+				ilELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				sbEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ml50EEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer50MbEntr[i]);
-				ml100EEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer100MbEntr[i]);
+				ilEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
@@ -579,7 +582,7 @@ public class SoundingFrame extends JFrame {
 				omega0_3[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
 						activeSounding.getWWind(), 0, 3000);
 				omegaCap[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
-						activeSounding.getWWind(), 0, ml100Lfc[i]);
+						activeSounding.getWWind(), 0, mlLfc[i]);
 				omegaInflow[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
 						activeSounding.getWWind(), inflowLayer[i][0], inflowLayer[i][1]);
 
@@ -826,6 +829,7 @@ public class SoundingFrame extends JFrame {
 			return drawSkewT(scale, pathType);
 		}
 
+		private static final double SKEW_AMOUNT = 0.75;
 		private BufferedImage drawSkewT(double scale, ParcelPath pathType) {
 			BufferedImage skewT = new BufferedImage((int) (800 * scale), (int) (800 * scale),
 					BufferedImage.TYPE_4BYTE_ABGR);
@@ -897,8 +901,8 @@ public class SoundingFrame extends JFrame {
 					double y1D = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPres));
 					double y2D = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPresNew));
 
-					double skew1 = linScale(0, 800, 400, 0, y1D);
-					double skew2 = linScale(0, 800, 400, 0, y2D);
+					double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1D);
+					double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2D);
 
 					double x1D = linScale(223.15, 323.15, 0, 800, parcelTemp);
 					double x2D = linScale(223.15, 323.15, 0, 800, parcelTempNew);
@@ -931,8 +935,8 @@ public class SoundingFrame extends JFrame {
 					double y1D = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPres));
 					double y2D = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPresNew));
 
-					double skew1 = linScale(0, 800, 400, 0, y1D);
-					double skew2 = linScale(0, 800, 400, 0, y2D);
+					double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1D);
+					double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2D);
 
 					double x1D = linScale(223.15, 323.15, 0, 800, parcelTemp);
 					double x2D = linScale(223.15, 323.15, 0, 800, parcelTempNew);
@@ -955,9 +959,9 @@ public class SoundingFrame extends JFrame {
 
 			// temperature lines
 			g.setColor(new Color(64, 64, 64));
-			for (int i = -100; i < 50; i += 10) {
+			for (int i = -150; i < 50; i += 10) {
 				int x = (int) linScale(-50, 50, 0, 800 * scale, i);
-				g.drawLine((int) (x + 400 * scale), 0, x, (int) (800 * scale));
+				g.drawLine((int) (x + (800 * SKEW_AMOUNT) * scale), 0, x, (int) (800 * scale));
 			}
 
 			if (parcelPathVisible) {
@@ -979,8 +983,8 @@ public class SoundingFrame extends JFrame {
 					double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressure[i]));
 					double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressure[i + 1]));
 
-					double skew1 = linScale(0, 800, 400, 0, y1);
-					double skew2 = linScale(0, 800, 400, 0, y2);
+					double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1);
+					double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2);
 
 					double x1V = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
 					double x2V = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
@@ -995,7 +999,7 @@ public class SoundingFrame extends JFrame {
 			g.setColor(new Color(127, 127, 255));
 			{
 				int x = (int) linScale(-50, 50, 0, 800 * scale, 0);
-				g.drawLine((int) (x + 400 * scale), 0, x, (int) (800 * scale));
+				g.drawLine((int) (x + (800 * SKEW_AMOUNT) * scale), 0, x, (int) (800 * scale));
 			}
 
 			g.setStroke(thickStroke);
@@ -1005,8 +1009,8 @@ public class SoundingFrame extends JFrame {
 				double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(pressure[i]));
 				double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(pressure[i + 1]));
 
-				double skew1 = linScale(0, 800, 400, 0, y1);
-				double skew2 = linScale(0, 800, 400, 0, y2);
+				double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1);
+				double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2);
 
 				if (drawDpt) {
 					g.setStroke(thinStroke);
@@ -1091,17 +1095,17 @@ public class SoundingFrame extends JFrame {
 				parcelPath = parcelPathSurfaceBased[activeReadoutSet];
 				parcelPathEntr = parcelPathSurfaceBasedEntr[activeReadoutSet];
 				break;
-			case MIXED_LAYER_50MB:
-				parcelPath = parcelPathMixedLayer50Mb[activeReadoutSet];
-				parcelPathEntr = parcelPathMixedLayer50MbEntr[activeReadoutSet];
-				break;
 			case MIXED_LAYER_100MB:
-				parcelPath = parcelPathMixedLayer100Mb[activeReadoutSet];
-				parcelPathEntr = parcelPathMixedLayer100MbEntr[activeReadoutSet];
+				parcelPath = parcelPathMixedLayer[activeReadoutSet];
+				parcelPathEntr = parcelPathMixedLayerEntr[activeReadoutSet];
 				break;
 			case MOST_UNSTABLE:
 				parcelPath = parcelPathMostUnstable[activeReadoutSet];
 				parcelPathEntr = parcelPathMostUnstableEntr[activeReadoutSet];
+				break;
+			case INFLOW_LAYER:
+				parcelPath = parcelPathInflowLayer[activeReadoutSet];
+				parcelPathEntr = parcelPathInflowLayerEntr[activeReadoutSet];
 				break;
 			}
 			
@@ -1123,8 +1127,8 @@ public class SoundingFrame extends JFrame {
 				double[] parcelDewpoint = new double[parcelPath.size()];
 				double[] parcelVirtualTemperature = new double[parcelPath.size()];
 
-				System.out.println(parcelPath.size());
-				System.out.println(parcelPathEntr.size());
+//				System.out.println(parcelPath.size());
+//				System.out.println(parcelPathEntr.size());
 				
 				for (int i = 0; i < parcelPressureEntr.length; i++) {
 					parcelPressureEntr[i] = parcelPathEntr.get(i).getPressure();
@@ -1146,56 +1150,58 @@ public class SoundingFrame extends JFrame {
 				double accumuLengthVirtTemp = 0.0;
 
 				g.setStroke(thinStroke);
-				// for some reason min function required here
-				for (int i = 0; i < Integer.min(parcelPressureEntr.length - 1, parcelPressure.length - 1); i++) {
+				for (int i = 0; i < parcelPressureEntr.length - 1; i++) {
 					double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressureEntr[i]));
 					double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressureEntr[i + 1]));
-					double skew1 = linScale(0, 800, 400, 0, y1);
-					double skew2 = linScale(0, 800, 400, 0, y2);
+					double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1);
+					double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2);
 					
-					{
-						double x1V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperatureEntr[i]);
-						double x2V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperatureEntr[i + 1]);
-	
-						double lengthVirtTempSegment = Math.hypot(((x1V + skew1) * scale) - ((x2V + skew2) * scale),
-								(y1 * scale) - (y2 * scale));
-						accumuLengthVirtTempEntr += lengthVirtTempSegment;
-	
-						if (accumuLengthVirtTempEntr % 8 < 4) {
-							g.setColor(new Color(150, 96, 32));
-							g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
-									(int) (y2 * scale));
-						}
-	
-						double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i]);
-						double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i + 1]);
-	
+					double x1V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperatureEntr[i]);
+					double x2V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperatureEntr[i + 1]);
+
+					double lengthVirtTempSegment = Math.hypot(((x1V + skew1) * scale) - ((x2V + skew2) * scale),
+							(y1 * scale) - (y2 * scale));
+					accumuLengthVirtTempEntr += lengthVirtTempSegment;
+
+					if (accumuLengthVirtTempEntr % 8 < 4) {
 						g.setColor(new Color(150, 96, 32));
-						g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+						g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
 								(int) (y2 * scale));
 					}
+
+					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i]);
+					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i + 1]);
+
+					g.setColor(new Color(150, 96, 32));
+					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+							(int) (y2 * scale));
+				}
+				
+				for (int i = 0; i < parcelPressure.length - 1; i++) {
+					double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressure[i]));
+					double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressure[i + 1]));
+					double skew1 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y1);
+					double skew2 = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y2);
 					
-					{
-						double x1V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperature[i]);
-						double x2V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperature[i + 1]);
+					double x1V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperature[i]);
+					double x2V = linScale(223.15, 323.15, 0, 800, parcelVirtualTemperature[i + 1]);
 
-						double lengthVirtTempSegment = Math.hypot(((x1V + skew1) * scale) - ((x2V + skew2) * scale),
-								(y1 * scale) - (y2 * scale));
-						accumuLengthVirtTemp += lengthVirtTempSegment;
+					double lengthVirtTempSegment = Math.hypot(((x1V + skew1) * scale) - ((x2V + skew2) * scale),
+							(y1 * scale) - (y2 * scale));
+					accumuLengthVirtTemp += lengthVirtTempSegment;
 
-						if (accumuLengthVirtTemp % 8 < 4) {
-							g.setColor(new Color(255, 255, 255));
-							g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
-									(int) (y2 * scale));
-						}
-
-						double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
-						double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
-
+					if (accumuLengthVirtTemp % 8 < 4) {
 						g.setColor(new Color(255, 255, 255));
-						g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+						g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
 								(int) (y2 * scale));
 					}
+
+					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
+					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
+
+					g.setColor(new Color(255, 255, 255));
+					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+							(int) (y2 * scale));
 				}
 			}
 
@@ -1630,128 +1636,128 @@ public class SoundingFrame extends JFrame {
 //			System.out.println("MU-LPL: " + muLpl[activeReadoutSet]);
 			
 			if(showEntrainment) {
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML-50MB", "ML-100MB", "MU"),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML", "MU", "IL"),
 						(int) (45 * scale), (int) (15 * scale));
 				g.drawString(String.format("%-9s%-9d%-9d%-9d%-9d", "ECAPE", (int) sbecape[activeReadoutSet],
-						(int) ml50ecape[activeReadoutSet], (int) ml100ecape[activeReadoutSet],
-						(int) muecape[activeReadoutSet]), (int) (45 * scale), (int) (30 * scale));
+						(int) mlecape[activeReadoutSet],
+						(int) muecape[activeReadoutSet], (int) ilecape[activeReadoutSet]), (int) (45 * scale), (int) (30 * scale));
 	
 				String sbcinh_ = (sbecape[activeReadoutSet] > 0) ? String.valueOf((int) sbecinh[activeReadoutSet]) : "-";
-				String ml50cinh_ = (ml50ecape[activeReadoutSet] > 0) ? String.valueOf((int) ml50ecinh[activeReadoutSet])
+				String ilcinh_ = (ilecape[activeReadoutSet] > 0 && inflowLayer[activeReadoutSet][0] > -999) ? String.valueOf((int) ilecinh[activeReadoutSet])
 						: "-";
-				String ml100cinh_ = (ml100ecape[activeReadoutSet] > 0) ? String.valueOf((int) ml100ecinh[activeReadoutSet])
+				String mlcinh_ = (mlecape[activeReadoutSet] > 0) ? String.valueOf((int) mlecinh[activeReadoutSet])
 						: "-";
 				String mucinh_ = (muecape[activeReadoutSet] > 0) ? String.valueOf((int) muecinh[activeReadoutSet]) : "-";
 	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "ECINH", sbcinh_, ml50cinh_, ml100cinh_, mucinh_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "ECINH", sbcinh_, mlcinh_, mucinh_, ilcinh_),
 						(int) (45 * scale), (int) (45 * scale));
 	
 				String sbLcl_ = String.format("%5.2f", sbELcl[activeReadoutSet] / 1000.0);
-				String ml50Lcl_ = String.format("%5.2f", ml50ELcl[activeReadoutSet] / 1000.0);
-				String ml100Lcl_ = String.format("%5.2f", ml100ELcl[activeReadoutSet] / 1000.0);
+				String ilLcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilELcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
+				String mlLcl_ = String.format("%5.2f", mlELcl[activeReadoutSet] / 1000.0);
 				String muLcl_ = String.format("%5.2f", (muELcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
 	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, ml50Lcl_, ml100Lcl_, muLcl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, mlLcl_, muLcl_, ilLcl_),
 						(int) (45 * scale), (int) (60 * scale));
 	
 				String sbCcl_ = String.format("%5.2f", sbECcl[activeReadoutSet] / 1000.0);
-				String ml50Ccl_ = String.format("%5.2f", ml50ECcl[activeReadoutSet] / 1000.0);
-				String ml100Ccl_ = String.format("%5.2f", ml100ECcl[activeReadoutSet] / 1000.0);
+				String ilCcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilECcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
+				String mlCcl_ = String.format("%5.2f", mlECcl[activeReadoutSet] / 1000.0);
 				String muCcl_ = String.format("%5.2f", (muECcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
 	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, ml50Ccl_, ml100Ccl_, muCcl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, mlCcl_, muCcl_, ilCcl_),
 						(int) (45 * scale), (int) (75 * scale));
 	
 				String sbLfc_ = (sbecape[activeReadoutSet] > 0) ? String.format("%5.2f", sbELfc[activeReadoutSet] / 1000.0)
 						: "-";
-				String ml50Lfc_ = (ml50ecape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml50ELfc[activeReadoutSet] / 1000.0)
+				String ilLfc_ = (ilecape[activeReadoutSet] > 0)
+						? String.format("%5.2f", (ilELfc[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
 						: "-";
-				String ml100Lfc_ = (ml100ecape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml100ELfc[activeReadoutSet] / 1000.0)
+				String mlLfc_ = (mlecape[activeReadoutSet] > 0)
+						? String.format("%5.2f", mlELfc[activeReadoutSet] / 1000.0)
 						: "-";
 				String muLfc_ = (muecape[activeReadoutSet] > 0)
 						? String.format("%5.2f", (muELfc[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
 						: "-";
 	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, ml50Lfc_, ml100Lfc_, muLfc_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, mlLfc_, muLfc_, ilLfc_),
 						(int) (45 * scale), (int) (90 * scale));
 	
 				String sbEl_ = (sbecape[activeReadoutSet] > 0) ? String.format("%5.2f", sbEEl[activeReadoutSet] / 1000.0)
 						: "-";
-				String ml50El_ = (ml50ecape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml50EEl[activeReadoutSet] / 1000.0)
+				String ilEl_ = (ilecape[activeReadoutSet] > 0)
+						? String.format("%5.2f", (ilEEl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
 						: "-";
-				String ml100El_ = (ml100ecape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml100EEl[activeReadoutSet] / 1000.0)
+				String mlEl_ = (mlecape[activeReadoutSet] > 0)
+						? String.format("%5.2f", mlEEl[activeReadoutSet] / 1000.0)
 						: "-";
 				String muEl_ = (muecape[activeReadoutSet] > 0)
 						? String.format("%5.2f", (muEEl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
 						: "-";
 	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, ml50El_, ml100El_, muEl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, mlEl_, muEl_, ilEl_),
 						(int) (45 * scale), (int) (105 * scale));
 			} else {
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML-50MB", "ML-100MB", "MU"),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML", "MU", "IL"),
 						(int) (45 * scale), (int) (15 * scale));
 				g.drawString(String.format("%-9s%-9d%-9d%-9d%-9d", "CAPE", (int) sbcape[activeReadoutSet],
-						(int) ml50cape[activeReadoutSet], (int) ml100cape[activeReadoutSet],
-						(int) mucape[activeReadoutSet]), (int) (45 * scale), (int) (30 * scale));
+						(int) mlcape[activeReadoutSet],
+						(int) mucape[activeReadoutSet], (int) ilcape[activeReadoutSet]), (int) (45 * scale), (int) (30 * scale));
 
 				String sbcinh_ = (sbcape[activeReadoutSet] > 0) ? String.valueOf((int) sbcinh[activeReadoutSet]) : "-";
-				String ml50cinh_ = (ml50cape[activeReadoutSet] > 0) ? String.valueOf((int) ml50cinh[activeReadoutSet])
+				String ilcinh_ = (ilcape[activeReadoutSet] > 0 && inflowLayer[activeReadoutSet][0] > -999) ? String.valueOf((int) ilcinh[activeReadoutSet])
 						: "-";
-				String ml100cinh_ = (ml100cape[activeReadoutSet] > 0) ? String.valueOf((int) ml100cinh[activeReadoutSet])
+				String mlcinh_ = (mlcape[activeReadoutSet] > 0) ? String.valueOf((int) mlcinh[activeReadoutSet])
 						: "-";
 				String mucinh_ = (mucape[activeReadoutSet] > 0) ? String.valueOf((int) mucinh[activeReadoutSet]) : "-";
 
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CINH", sbcinh_, ml50cinh_, ml100cinh_, mucinh_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CINH", sbcinh_, mlcinh_, mucinh_, ilcinh_),
 						(int) (45 * scale), (int) (45 * scale));
 
 				String sbLcl_ = String.format("%5.2f", sbLcl[activeReadoutSet] / 1000.0);
-				String ml50Lcl_ = String.format("%5.2f", ml50Lcl[activeReadoutSet] / 1000.0);
-				String ml100Lcl_ = String.format("%5.2f", ml100Lcl[activeReadoutSet] / 1000.0);
+				String ilLcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilLcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
+				String mlLcl_ = String.format("%5.2f", mlLcl[activeReadoutSet] / 1000.0);
 				String muLcl_ = String.format("%5.2f", (muLcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
 
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, ml50Lcl_, ml100Lcl_, muLcl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, mlLcl_, muLcl_, ilLcl_),
 						(int) (45 * scale), (int) (60 * scale));
 
 				String sbCcl_ = String.format("%5.2f", sbCcl[activeReadoutSet] / 1000.0);
-				String ml50Ccl_ = String.format("%5.2f", ml50Ccl[activeReadoutSet] / 1000.0);
-				String ml100Ccl_ = String.format("%5.2f", ml100Ccl[activeReadoutSet] / 1000.0);
+				String ilCcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilCcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
+				String mlCcl_ = String.format("%5.2f", mlCcl[activeReadoutSet] / 1000.0);
 				String muCcl_ = String.format("%5.2f", (muCcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
 
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, ml50Ccl_, ml100Ccl_, muCcl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, mlCcl_, muCcl_, ilCcl_),
 						(int) (45 * scale), (int) (75 * scale));
 
 				String sbLfc_ = (sbcape[activeReadoutSet] > 0) ? String.format("%5.2f", sbLfc[activeReadoutSet] / 1000.0)
 						: "-";
-				String ml50Lfc_ = (ml50cape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml50Lfc[activeReadoutSet] / 1000.0)
+				String ilLfc_ = (ilcape[activeReadoutSet] > 0)
+						? String.format("%5.2f", (ilLfc[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
 						: "-";
-				String ml100Lfc_ = (ml100cape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml100Lfc[activeReadoutSet] / 1000.0)
+				String mlLfc_ = (mlcape[activeReadoutSet] > 0)
+						? String.format("%5.2f", mlLfc[activeReadoutSet] / 1000.0)
 						: "-";
 				String muLfc_ = (mucape[activeReadoutSet] > 0)
 						? String.format("%5.2f", (muLfc[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
 						: "-";
 
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, ml50Lfc_, ml100Lfc_, muLfc_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, mlLfc_, muLfc_, ilLfc_),
 						(int) (45 * scale), (int) (90 * scale));
 
 				String sbEl_ = (sbcape[activeReadoutSet] > 0) ? String.format("%5.2f", sbEl[activeReadoutSet] / 1000.0)
 						: "-";
-				String ml50El_ = (ml50cape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml50El[activeReadoutSet] / 1000.0)
+				String ilEl_ = (ilcape[activeReadoutSet] > 0)
+						? String.format("%5.2f", (ilEl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
 						: "-";
-				String ml100El_ = (ml100cape[activeReadoutSet] > 0)
-						? String.format("%5.2f", ml100El[activeReadoutSet] / 1000.0)
+				String mlEl_ = (mlcape[activeReadoutSet] > 0)
+						? String.format("%5.2f", mlEl[activeReadoutSet] / 1000.0)
 						: "-";
 				String muEl_ = (mucape[activeReadoutSet] > 0)
 						? String.format("%5.2f", (muEl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
 						: "-";
 
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, ml50El_, ml100El_, muEl_),
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, mlEl_, muEl_, ilEl_),
 						(int) (45 * scale), (int) (105 * scale));
 			}
 
@@ -1894,7 +1900,7 @@ public class SoundingFrame extends JFrame {
 
 			g.drawString(String.format("%-9s%-9s", "0-3 km", omega0_3_), (int) (245 * scale), (int) (330 * scale));
 
-			String omegaCap_ = (activeSounding.getWWind().length > 0 && ml100cape[activeReadoutSet] > 0)
+			String omegaCap_ = (activeSounding.getWWind().length > 0 && mlcape[activeReadoutSet] > 0)
 					? String.format("%4.2f", omegaCap[activeReadoutSet])
 					: "-";
 
@@ -1983,8 +1989,8 @@ public class SoundingFrame extends JFrame {
 //			System.out.println(bgRevised);
 //			System.out.println(bgRevExt);
 			
-//			g.setColor(new Color(192, 192, 192));
-//			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (9 * scale)));
+			g.setColor(new Color(192, 192, 192));
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (9 * scale)));
 //			double surfacePressure = activeSounding.getPressureLevels()[activeSounding.getPressureLevels().length - 1];
 //			double surfaceHeight = activeSounding.getHeight()[activeSounding.getHeight().length - 1];
 //			double meltingEnergy = PtypeAlgorithms.meltingEnergy(activeSounding.getPressureLevels(),
@@ -2585,8 +2591,8 @@ public class SoundingFrame extends JFrame {
 		}
 	}
 
-	private static final String[] parcelPathOptions = { "None", "Surface Based", "Mixed Layer (50 mb)",
-			"Mixed Layer (100 mb)", "Most Unstable" };
+	private static final String[] parcelPathOptions = { "None", "Surface Based", "Mixed Layer",
+			"Most Unstable", "Inflow Layer" };
 
 	private void selectParcelPathType() {
 		String fieldChoice = (String) JOptionPane.showInputDialog(null, "What type of parcel path would you like?",
@@ -2826,20 +2832,20 @@ public class SoundingFrame extends JFrame {
 				3000, 12000);
 		double mw3_12 = Math.hypot(mw3_12Vec[0], mw3_12Vec[1]);
 
-		double wndg_mlcapeTerm = ml100cape[activeReadoutSet] / 2000;
+		double wndg_mlcapeTerm = mlcape[activeReadoutSet] / 2000;
 		double wndg_lr0_3Term = lapseRate0_3km / 0.009;
 		double wndg_mwTerm = mw1000_3500 / 15;
-		double wndg_mlcinhTerm = (50 + ml100cinh[activeReadoutSet]) / 40;
+		double wndg_mlcinhTerm = (50 + mlcinh[activeReadoutSet]) / 40;
 
 		double lowRH = WeatherUtils.averageParameterOverLayer(height, relativeHumidity, 0, 3000);
 		double midRH = WeatherUtils.averageParameterOverLayer(height, relativeHumidity, 3000, 8000);
 
 		if (lapseRate0_3km < 0.007)
 			wndg_lr0_3Term = 0;
-		if (ml100cinh[activeReadoutSet] < -50)
+		if (mlcinh[activeReadoutSet] < -50)
 			wndg_mlcinhTerm = 0;
 
-		double sigSvr = ml100cape[activeReadoutSet] * bwd0_6;
+		double sigSvr = mlcape[activeReadoutSet] * bwd0_6;
 
 		double mmp = 0;
 		if (mucape[activeReadoutSet] >= 100) {
@@ -2857,14 +2863,14 @@ public class SoundingFrame extends JFrame {
 
 		if (stpE[activeReadoutSet] >= 3 && stpF[activeReadoutSet] >= 3 && srh0_1[activeReadoutSet] >= 200
 				&& srhInflow[activeReadoutSet] >= 200 && srw4_6 >= 15 * 0.5144444 && bwd0_8 >= 45 * 0.5144444
-				&& sbLcl[activeReadoutSet] < 1000 && ml100Lcl[activeReadoutSet] < 1200 && lapseRate0_1km >= 0.005
-				&& ml100cinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
+				&& sbLcl[activeReadoutSet] < 1000 && mlLcl[activeReadoutSet] < 1200 && lapseRate0_1km >= 0.005
+				&& mlcinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
 				return PDS_DEV_TOR;
 			} else {
 				return PDS_TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 3 || stpF[activeReadoutSet] >= 4) && ml100cinh[activeReadoutSet] >= -125
+		} else if ((stpE[activeReadoutSet] >= 3 || stpF[activeReadoutSet] >= 4) && mlcinh[activeReadoutSet] >= -125
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
 				return DEV_TOR;
@@ -2872,7 +2878,7 @@ public class SoundingFrame extends JFrame {
 				return TOR;
 			}
 		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1)
-				&& (srw4_6 >= 15 * 0.5144444 || bwd0_8 >= 40 * 0.5144444) && ml100cinh[activeReadoutSet] >= -50
+				&& (srw4_6 >= 15 * 0.5144444 || bwd0_8 >= 40 * 0.5144444) && mlcinh[activeReadoutSet] >= -50
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
 				return DEV_TOR;
@@ -2880,19 +2886,19 @@ public class SoundingFrame extends JFrame {
 				return TOR;
 			}
 		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1) && (lowRH + midRH) / 2 >= 0.6
-				&& lapseRate0_1km >= 0.005 && ml100cinh[activeReadoutSet] >= -50
+				&& lapseRate0_1km >= 0.005 && mlcinh[activeReadoutSet] >= -50
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
 				return DEV_TOR;
 			} else {
 				return TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1) && ml100cinh[activeReadoutSet] >= -150
+		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1) && mlcinh[activeReadoutSet] >= -150
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			return MRGL_TOR;
 		} else if ((stpE[activeReadoutSet] >= 1 && srhInflow[activeReadoutSet] >= 150)
 				|| (stpF[activeReadoutSet] >= 0.5 && srh0_1[activeReadoutSet] >= 150)
-						&& ml100cinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
+						&& mlcinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
 			return MRGL_TOR;
 		} else if ((stpF[activeReadoutSet] >= 1 || mesocycloneSign * scp[activeReadoutSet] >= 4
 				|| stpE[activeReadoutSet] >= 1) && mucinh[activeReadoutSet] >= -50) {

@@ -77,13 +77,9 @@ public class SoundingTest {
 			
 //			System.out.printf("%6.1f\t%5.0f\t%5.1f\t%5.1f\t%4.1f\t%4.1f\n", pressure[i], height[i], temperature[i], dewpoint[i], uWind[i], vWind[i]);
 		}
-
-		for(int i = 0; i < lines.size(); i++) {
-			height[i] = WeatherUtils.heightAtPressure(pressure[pressure.length - 1], pressure[i]);
-		}
 		
 		Sounding soundingObj = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind);
-		DateTime time = new DateTime(2023, 02, 27, 3, 0, DateTimeZone.UTC);
+		DateTime time = new DateTime(2023, 2, 27, 3, 0, DateTimeZone.UTC);
 		
 		new SoundingFrame("Norman OK Weather Balloon", soundingObj, time, 35.1808, -97.4378);
 	}
