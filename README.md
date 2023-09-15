@@ -28,7 +28,7 @@ If you want to get the historical sounding for Norman, Oklahoma on February 27, 
 
 # How to use the API in your own Java projects
 
-Include the JAR file in your project's build path. It is the same jar file as the GUI and the CLI.
+Include the JAR file in your project's build path. It is the same JAR file as the GUI and the CLI.
 
 First, select a radiosonde site with `RadiosondeSite.findSite(String code);`, where the codes for each site can be found in <a href="https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-station-list.txt">the IGRA2 station list</a> or on <a href="https://www.spc.noaa.gov/exper/soundings/">the SPC Experimental Soundings page</a>.
 
