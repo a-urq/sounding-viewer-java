@@ -20,6 +20,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -32,24 +33,22 @@ import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class RadiosondeWrapper {
 	private static int startOfCurrentData;
-
-	static {
-		try {
-			startOfCurrentData = determineStartOfCurrentData();
-
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-					| UnsupportedLookAndFeelException e) {
-				e.printStackTrace();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			startOfCurrentData = -1024;
-		}
+	
+	// created for use in optimizing RadarView performance
+	public static void initialize() throws IOException {
+		startOfCurrentData = determineStartOfCurrentData();
+		@SuppressWarnings("unused")
+		int dummy = startOfCurrentData; // useless on its own, induces static init block. idk if there's a smarter or less hacky way to do this
 	}
 
 	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		
 //		try {
 //			downloadFile(, "USM00072357-data.txt.zip");
 //		} catch (IOException e) {
@@ -57,7 +56,7 @@ public class RadiosondeWrapper {
 //		}
 
 //		displaySounding(RadiosondeSite.findSite("KFWD"), 2019, 10, 21, 0);
-//		displaySounding(RadiosondeSite.findSite("KFWD"), 2016, 04, 12, 0);
+//		displaySounding(RadiosondeSite.findSite("KFWD"), 2017, 2, 11, 19);
 //		displaySounding(RadiosondeSite.findSite("KOUN"), 1999, 5, 4, 0);
 //		displaySounding(RadiosondeSite.findSite("KOUN"), 2021, 2, 16, 0);
 //		displaySounding(RadiosondeSite.findSite("KFWD"), 2023, 6, 21, 0);
@@ -67,21 +66,237 @@ public class RadiosondeWrapper {
 //		displaySounding(RadiosondeSite.findSite("KOUN"), 2023, 9, 7, 0);
 //		displaySounding(RadiosondeSite.findSite("KOUN"), 2023, 2, 27, 3);
 
-		displayCurrentSounding(RadiosondeSite.findSite("KFWD"));
+//		displayCurrentSounding(RadiosondeSite.findSite("KCRP"));
 
+//		args = new String[] { "-h", "-s", "KOUN", "-d", "20230227-03" };
+//		args = new String[] { "-c", "-s", "KOUN"};
+		
 		if (args.length == 0) {
 			doGui();
 		} else {
-			doCli();
+			doCli(args);
 		}
 	}
 
 	private static void doGui() {
-
+		JFrame init = new JFrame( 
+				"Connecting to IGRA2 archive, this may take a few seconds...");
+		init.setSize(500, 0);
+		init.setLocationRelativeTo(null);
+		init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		init.setVisible(true);
+		
+		try {
+			initialize();
+			RadiosondeSite.init();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		init.dispose();
+		
+		int currHistOption = JOptionPane.showOptionDialog(null, "Would you like to view a current or historical weather balloon?", 
+				"IGRA2/SPC-EXPER Radiosonde Viewer", 0, JOptionPane.DEFAULT_OPTION, null, new String[] {"Current", "Historical"}, 0);
+		
+		doGuiCurrHist(currHistOption);
+	}
+	
+	private static void doGuiCurrHist(int currHistOption) {
+		if(currHistOption == 0) {
+			RadiosondeSite site = selectSiteGui(true);
+			
+			if(site.getFourLetterCode().length() > 0) {
+				RadiosondeWrapper.displayCurrentSounding(site);
+			} else {
+				try {
+					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
+				} catch (RadiosondeNotFoundException e) {
+					e.printStackTrace();
+					System.exit(0);
+				}
+			}
+		} else if(currHistOption == 1) {
+			RadiosondeSite site = selectSiteGui(false);
+			
+			doGuiHistDate(currHistOption, site);
+		} 
 	}
 
-	private static void doCli() {
+	private static void doGuiHistDate(int currHistOption, RadiosondeSite site) {
+		DateTime d = selectDateGui();
+		
+		try {
+			displaySounding(site, d);
+		} catch (RadiosondeNotFoundException e) {
+			int errOption = JOptionPane.showOptionDialog(null, "Radiosonde not found for\n " + site.toString() + " - " + d.toString() + "\nand no suitably close data could be found.\nWould you like to try another date, another site, or quit the program?", 
+				"IGRA2/SPC-EXPER Radiosonde Viewer", 0, JOptionPane.ERROR_MESSAGE, null, new String[] {"Another Date", "Another Site", "Quit"}, 0);
+		
+			switch(errOption) {
+			case 0:
+				doGuiHistDate(currHistOption, site);
+				break;
+			case 1:
+				doGuiCurrHist(currHistOption);
+				break;
+			case 2:
+				System.exit(0);
+				break;
+			default:
+				System.exit(0);
+			}
+		}
+	}
+	
+	private static RadiosondeSite selectSiteGui(boolean current) {
+		String chosenCountry = (String) JOptionPane.showInputDialog(null, "In what country is the site you want to use?", 
+				"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE, null, RadiosondeSite.getCountries(),
+				RadiosondeSite.getCountries()[0]);
+		
+		System.out.println(chosenCountry);
 
+		String chosenState = "";
+		if("United States".equals(chosenCountry)) {
+			chosenState = (String) JOptionPane.showInputDialog(null, "In what state is the site you want to use?", 
+					"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE, null, RadiosondeSite.getUsStates(),
+					RadiosondeSite.getUsStates()[0]);
+			
+			System.out.println(chosenState);
+		}
+		
+		RadiosondeSite[] sites = RadiosondeSite.getSitesInRegion(chosenCountry, chosenState, current);
+		
+		String[] siteNames = new String[sites.length];
+		
+		for(int i = 0; i < sites.length; i++) {
+			siteNames[i] = sites[i].getCity();
+			
+			if(!current) {
+				siteNames[i] += " (" + sites[i].getStartYear() + " - " + sites[i].getEndYear() + ")";
+			}
+		}
+		
+		String chosenCity = (String) JOptionPane.showInputDialog(null, "Which site you want to use?", 
+				"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE, null, siteNames,
+				siteNames[0]);
+		
+		System.out.println(chosenCity);
+		
+		int indexOfSite = -1;
+		
+		for(int i = 0; i < siteNames.length; i++) {
+			if(chosenCity.equals(siteNames[i])) {
+				indexOfSite = i;
+				break;
+			}
+		}
+		
+		RadiosondeSite selectedSite = sites[indexOfSite];
+		
+		return selectedSite;
+	}
+	
+	private static DateTime selectDateGui() {
+		String dateStr = (String) JOptionPane.showInputDialog(null, "What date and time would you like to see? Use format YYYYMMDD-HH.", 
+				"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE);
+		
+		int yyyy = Integer.valueOf(dateStr.substring(0, 4));
+		int mm = Integer.valueOf(dateStr.substring(4, 6));
+		int dd = Integer.valueOf(dateStr.substring(6, 8));
+		int hh = Integer.valueOf(dateStr.substring(9, 11));
+		
+		return new DateTime(yyyy, mm, dd, hh, 0, DateTimeZone.UTC);
+	}
+
+	private static void doCli(String[] args) {
+		String currHistFlag = args[0];
+		
+		if("-c".equals(currHistFlag)) {
+			String[] flag = { args[1] };
+			String[] arg = { args[2] };
+			
+			RadiosondeSite site = null;
+			
+			for(int i = 0; i < flag.length; i++) {
+				if("-s".equals(flag[0])) {
+					String siteArg = arg[0];
+
+					System.out.println("Connecting to IGRA2 archive, please wait 10-15 seconds...");
+					try {
+						initialize();
+					} catch (IOException e) {
+						System.err.println("Could not connect to IGRA2 archive.");
+						e.printStackTrace();
+						return;
+					}
+					
+					site = RadiosondeSite.findSite(siteArg);
+					System.out.println("Connection complete.");
+				}
+			}
+			
+			if(site.getFourLetterCode().length() > 0) {
+				RadiosondeWrapper.displayCurrentSounding(site);
+			} else {
+				try {
+					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
+				} catch (RadiosondeNotFoundException e) {
+					e.printStackTrace();
+					System.exit(0);
+				}
+			}
+		} else if("-h".equals(currHistFlag)) {
+			String[] flag = { args[1], args[3] };
+			String[] arg = { args[2], args[4] };
+			
+			RadiosondeSite site = null;
+			DateTime d = null;
+			
+			for(int i = 0; i < flag.length; i++) {
+				if("-s".equals(flag[i])) {
+					String siteArg = arg[i];
+
+					System.out.println("Connecting to IGRA2 archive, please wait 10-15 seconds...");
+					try {
+						initialize();
+					} catch (IOException e) {
+						System.err.println("Could not connect to IGRA2 archive.");
+						e.printStackTrace();
+						return;
+					}
+					
+					site = RadiosondeSite.findSite(siteArg);
+					System.out.println("Connection complete.");
+				}
+				
+				if("-d".equals(flag[i])) {
+					String dateArg = arg[i];
+					
+					System.out.println("if sounding doesn't load, try using date format YYYYMMDD-HH");
+					
+					int yyyy = Integer.valueOf(dateArg.substring(0, 4));
+					int mm = Integer.valueOf(dateArg.substring(4, 6));
+					int dd = Integer.valueOf(dateArg.substring(6, 8));
+					int hh = Integer.valueOf(dateArg.substring(9, 11));
+					
+					System.out.println();
+					
+					d = new DateTime(yyyy, mm, dd, hh, 0, DateTimeZone.UTC);
+				}
+			}
+			
+			System.out.println();
+			
+			try {
+				
+				RadiosondeWrapper.displaySounding(site, d);
+			} catch (RadiosondeNotFoundException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		} else {
+			System.out.println("Please use either -c (Current) or -h (Historical) as the first argument.");
+		}
 	}
 
 	public static void displayCurrentSounding(RadiosondeSite site) {
@@ -93,27 +308,30 @@ public class RadiosondeWrapper {
 		loading.setVisible(true);
 		
 		displaySpcExperSounding(site);
-		loading.setVisible(false);
+		loading.dispose();
 	}
 
-	public static void displaySounding(RadiosondeSite site, int year, int month, int day, int hour) {
-		JFrame loading = new JFrame((year >= startOfCurrentData) ? 
-				"Loading radiosonde, this may take a little while..." :
-					"Loading radiosonde, this may take a minute or two...");
-		
-		loading.setSize(500, 0);
-		loading.setLocationRelativeTo(null);
-		loading.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		loading.setVisible(true);
-		
+	public static void displaySounding(RadiosondeSite site, int year, int month, int day, int hour) throws RadiosondeNotFoundException {
 		DateTime d = new DateTime(year, month, day, hour, 0, DateTimeZone.UTC);
 
 		displaySounding(site, d);
-		loading.setVisible(false);
 	}
 
 	public static void displaySpcExperSounding(RadiosondeSite site) {
 		try {
+			if(startOfCurrentData == 0) {
+				JFrame init = new JFrame( 
+						"Connecting to IGRA2 archive, this may take a few seconds...");
+				init.setSize(500, 0);
+				init.setLocationRelativeTo(null);
+				init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				init.setVisible(true);
+				
+				initialize();
+				
+				init.dispose();
+			}
+			
 			Object[] soundingRet = getSoundingSPCExper(site);
 			Sounding sounding = (Sounding) soundingRet[0];
 			DateTime d = (DateTime) soundingRet[1];
@@ -125,12 +343,35 @@ public class RadiosondeWrapper {
 		}
 	}
 
-	public static void displaySounding(RadiosondeSite site, DateTime d) {
+	public static void displaySounding(RadiosondeSite site, DateTime d) throws RadiosondeNotFoundException {
 		try {
+			if(startOfCurrentData == 0) {
+				JFrame init = new JFrame( 
+						"Connecting to IGRA2 archive, this may take a few seconds...");
+				init.setSize(500, 0);
+				init.setLocationRelativeTo(null);
+				init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				init.setVisible(true);
+				
+				initialize();
+				
+				init.dispose();
+			}
+			
+			JFrame loading = new JFrame((d.getYear() >= startOfCurrentData) ? 
+					"Loading radiosonde, this may take a little while..." :
+						"Loading radiosonde, this may take a minute or two...");
+			
+			loading.setSize(500, 0);
+			loading.setLocationRelativeTo(null);
+			loading.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			loading.setVisible(true);
+			
 			Object[] soundingRet = getSounding(site, d);
 			Sounding sounding = (Sounding) soundingRet[0];
 			d = (DateTime) soundingRet[1];
 
+			loading.dispose();
 			new SoundingFrame(site.locationString() + " Radiosonde", sounding, d, site.getLatitude(),
 					site.getLongitude());
 		} catch (IOException e) {
@@ -138,7 +379,9 @@ public class RadiosondeWrapper {
 		}
 	}
 
-	private static Object[] getSounding(RadiosondeSite site, DateTime d) throws IOException {
+	private static Object[] getSounding(RadiosondeSite site, DateTime d) throws IOException, RadiosondeNotFoundException {
+		DateTime dOrig = d;
+		
 		Object[] soundingTextRet = getSoundingText(site, d); // { String, DateTime } a little gross but best i can think
 																// of
 
@@ -147,6 +390,10 @@ public class RadiosondeWrapper {
 
 //		System.out.println(d);
 //		System.out.println(soundingText);
+		
+		if(d == null) {
+			throw new RadiosondeNotFoundException("Radiosonde " + site.getInternationalCode() + " " + dOrig + " does not exist and no suitably close data could be found.");
+		}
 
 		String[] linesRaw = soundingText.split("\\n");
 
@@ -167,6 +414,10 @@ public class RadiosondeWrapper {
 			double relativeHumidity_ = Double.valueOf(relativeHumidityStr) / 1000.0;
 			double windDirection_ = Double.valueOf(windDirectionStr) + 180.0;
 			double windSpeed_ = Double.valueOf(windSpeedStr) / 10.0;
+			
+			if(temperature_ >= 130 && relativeHumidity_ < -1) {
+				relativeHumidity_ = 0.001;
+			}
 
 			if (pressure_ < -10 || temperature_ < 130 || relativeHumidity_ < -1 || windDirection_ < -10
 					|| windSpeed_ < -10) {
@@ -190,7 +441,7 @@ public class RadiosondeWrapper {
 			String pressureStr = line.substring(9, 15);
 			String heightStr = line.substring(16, 21);
 			String temperatureStr = line.substring(23, 27);
-			String relativeHumidityStr = line.substring(29, 33);
+			String relativeHumidityStr = line.substring(28, 33);
 			String windDirectionStr = line.substring(41, 45);
 			String windSpeedStr = line.substring(47, 51);
 
@@ -200,6 +451,15 @@ public class RadiosondeWrapper {
 			double relativeHumidity_ = Double.valueOf(relativeHumidityStr) / 1000.0;
 			double windDirection_ = Double.valueOf(windDirectionStr) + 180.0;
 			double windSpeed_ = Double.valueOf(windSpeedStr) / 10.0;
+			
+			if(temperature_ >= 130 && relativeHumidity_ < -1) {
+//				System.out.println(relativeHumidity_);
+				relativeHumidity_ = 0.001;
+			}
+			
+			if(i == lines.size() -1 && height_ < -1) {
+				height_ = 0;
+			}
 
 			double dewpoint_ = WeatherUtils.dewpoint(temperature_, relativeHumidity_);
 
@@ -279,7 +539,7 @@ public class RadiosondeWrapper {
 
 				DateTime testD = new DateTime(year, month, day, hour, 0, DateTimeZone.UTC);
 
-				if (Math.abs(testD.getMillis() - d.getMillis()) < 86400000) {
+				if (Math.abs(testD.getMillis() - d.getMillis()) < 86400000*7) {
 					String soundingText = "";
 
 					while (sc.hasNextLine()) {
@@ -325,8 +585,9 @@ public class RadiosondeWrapper {
 		long closestMillis = Long.MAX_VALUE;
 
 		for (DateTime testD : soundingTexts.keySet()) {
+//			System.out.println(d + " " + testD + " " + closestD + " " + Math.abs(testD.getMillis() - d.getMillis()) + " " + closestMillis);
 			if (Math.abs(testD.getMillis() - d.getMillis()) < closestMillis) {
-				closestMillis = testD.getMillis() - d.getMillis();
+				closestMillis = Math.abs(testD.getMillis() - d.getMillis());
 				closestD = testD;
 			}
 		}

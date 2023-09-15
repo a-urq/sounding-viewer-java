@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset='utf-8'>
-        <title>RadarView Help Page</title>
+        <title>Sounding Viewer Controls Page</title>
         <style>
             html{
                 font-family: sans-serif;
@@ -58,15 +58,15 @@
         <h3>Surface Based</h3>
         <p><b>When to use:</b> Surface based storms. May be useful in assessing tornado potential in surface based supercells.</p>
         <p><b>How it's calculated:</b> Sets the pressure, temperature, and dewpoint of the starting point to that of the environmental air at the surface.</p>
-        <h3>Mixed Layer (50 mb)</h3>
-        <p><b>When to use:</b> Surface based storms. May be most useful in storms with shallow inflow layers.</p>
-        <p><b>How it's calculated:</b> Computes the average potential temperature and mixing ratio in the lowest 50 mb of the atmosphere. Sets the pressure of the starting point to that of the surface air. Computes the parcel temperature using the average potential temperature and surface pressure and the parcel dewpoint using the average mixing ratio and surface pressure.</p>
-        <h3>Mixed Layer (100 mb)</h3>
-        <p><b>When to use:</b> Surface based storms. May be most useful in storms with deep inflow layers.</p>
+        <h3>Mixed Layer</h3>
+        <p><b>When to use:</b> Surface based storms. Often used as a general-purpose indicator of storm strength.</p>
         <p><b>How it's calculated:</b> Computes the average potential temperature and mixing ratio in the lowest 100 mb of the atmosphere. Sets the pressure of the starting point to that of the surface air. Computes the parcel temperature using the average potential temperature and surface pressure and the parcel dewpoint using the average mixing ratio and surface pressure.</p>
         <h3>Most Unstable</h3>
         <p><b>When to use:</b> Elevated storms.</p>
         <p><b>How it's calculated:</b> Finds the pressure level with the highest Theta-E (equivalent potential temperature). Sets the pressure, temperature, and dewpoint to the environmental air at that level.</p>
+        <h3>Inflow Layer</h3>
+        <p><b>When to use:</b> Any storm. Will display nothing if no inflow layer is found.</p>
+        <p><b>How it's calculated:</b> Computes the average potential temperature and mixing ratio in the effective inflow layer. Sets the pressure of the starting point to that of the inflow base (often the surface for surface-based storms). Computes the parcel temperature using the average potential temperature and surface pressure and the parcel dewpoint using the average mixing ratio and inflow base pressure.</p>
 
         <h2>Storm Motion Vector Options</h2>
         <h3>Left Moving</h3>

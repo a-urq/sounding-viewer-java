@@ -16,6 +16,8 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 public class RadiosondeSite implements Comparable<RadiosondeSite> {
 	public static String dataFolder = System.getProperty("user.home") + "/Documents/SoundingViewer/data/";
@@ -52,6 +54,10 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 	static {
 		initializeSites();
 	}
+	
+	public static void init() {
+		initializeSites();
+	}
 
 	public static void main(String[] args) {
 //		for(int i = 0; i < sites.size(); i++) {
@@ -63,6 +69,9 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 		System.out.println(findSite("KOUN"));
 	}
 
+	private static String[][] countryListArr = null;
+	private static String[][] usStatesArr = null;
+	
 	private static void initializeSites() {
 		try {
 			File stationList = downloadFile(
@@ -79,16 +88,19 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 			File fourLetterCodes = loadResourceAsFile("res/fourLetterCodes.txt");
 
 			String[][] stationListArr = parseFixedWidth(stationList, 11, 9, 10, 7, 4, 30, 5, 6, 5);
-			String[][] usStatesArr = parseFixedWidth(usStatesList, 2, 40);
-			String[][] countryListArr = parseFixedWidth(countryList, 2, 40);
+			usStatesArr = parseFixedWidth(usStatesList, 2, 40);
+			countryListArr = parseFixedWidth(countryList, 2, 40);
 			String[][] fourLetterCodesArr = parseFixedWidth(fourLetterCodes, 11, 40);
 
 			HashMap<String, String> usStatesMap = arrToHashMap(usStatesArr);
 			HashMap<String, String> countryListMap = arrToHashMap(countryListArr);
 			HashMap<String, String> fourLetterCodesMap = arrToHashMap(fourLetterCodesArr);
+			
+			sites = new ArrayList<>();
 
 			for (String[] line : stationListArr) {
 //				System.out.println(Arrays.toString(line));
+//				System.out.println(sites.size());
 
 				String internationalCode = line[0];
 				double latitude = Double.valueOf(line[1]);
@@ -257,6 +269,63 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 
 	public int getNumRecords() {
 		return numRecords;
+	}
+	
+	public static String[] getCountries() {
+		String[] countries = new String[countryListArr.length];
+		
+		countries[0] = "United States";
+		
+		boolean detectedUS = false;
+		
+		for(int i = 0; i < countries.length; i++) {
+			if(detectedUS) {
+				countries[i] = countryListArr[i][1];
+			} else {
+				if("United States".equals(countryListArr[i][1])) {
+					detectedUS = true;
+					continue;
+				}
+					
+				countries[i + 1] = countryListArr[i][1];
+			}
+		}
+		
+		return countries;
+	}
+	
+	public static String[] getUsStates() {
+		String[] states = new String[usStatesArr.length];
+		
+		for(int i = 0; i < states.length; i++) {
+			states[i] = usStatesArr[i][1];
+		}
+		
+		return states;
+	}
+	
+	public static RadiosondeSite[] getSitesInRegion(String country, String state, boolean current) {
+		ArrayList<RadiosondeSite> sitesList = new ArrayList<>();
+		
+		DateTime nowMinus7 = DateTime.now(DateTimeZone.UTC).minusDays(7);
+		
+		for(int i = 0; i < sites.size(); i++) {
+//			System.out.println(sites.get(i));
+			if(country.equals(sites.get(i).getCountry()) && state.equals(sites.get(i).getState())) {
+				if(!current || sites.get(i).getEndYear() >= nowMinus7.getYear()) {
+					sitesList.add(sites.get(i));
+				}
+			}
+			
+//			System.out.println(sitesList.size());
+		}
+		
+		RadiosondeSite[] sites = new RadiosondeSite[sitesList.size()];
+		for(int i = 0; i < sitesList.size(); i++) {
+			sites[i] = sitesList.get(i);
+		}
+		
+		return sites;
 	}
 
 	public static File loadResourceAsFile(String urlStr) {

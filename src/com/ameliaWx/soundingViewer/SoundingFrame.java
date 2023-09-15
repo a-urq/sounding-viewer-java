@@ -30,6 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JComponent;
@@ -392,10 +393,10 @@ public class SoundingFrame extends JFrame {
 				ilcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
 
-				sbLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathSurfaceBased[i]);
-				ilLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathInflowLayer[i]);
-				mlLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayer[i]);
-				muLcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMostUnstable[i]);
+				sbLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathSurfaceBased[i]);
+				ilLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathInflowLayer[i]);
+				mlLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayer[i]);
+				muLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstable[i]);
 
 				sbCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
@@ -442,10 +443,10 @@ public class SoundingFrame extends JFrame {
 				muecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
-				sbELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathSurfaceBasedEntr[i]);
-				ilELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathInflowLayerEntr[i]);
-				mlELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMixedLayerEntr[i]);
-				muELcl[i] = WeatherUtils.liftedCondensationLevel(surfacePressure, parcelPathMostUnstableEntr[i]);
+				sbELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathSurfaceBasedEntr[i]);
+				ilELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathInflowLayerEntr[i]);
+				mlELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayerEntr[i]);
+				muELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstableEntr[i]);
 
 				sbECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
