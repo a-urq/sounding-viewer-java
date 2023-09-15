@@ -1,12 +1,42 @@
 # sounding-viewer-java
-A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear.
+A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear. Exists both as a standalone program and as an API. 
+
+Be advised that integration with IGRA2 soundings from outside of the US is currently having issues.
 
 # Dependencies
 joda-time
 
 WeatherUtils (https://github.com/a-urq/weather-utils-java)
 
-# How to use in your own Java projects
+# How to use the GUI
+Double-click the JAR file or run it in your command prompt or terminal with no arguments and follow the dialog boxes.
+
+# How to use the CLI
+Run the JAR file in your command prompt or terminal using arguments. The arguments to be used are documented below.
+
+`-c`: Specifies that the program should pull current data. This argument should always be used first.
+
+`-h`: Specifies that the program should pull historical data. This argument should always be used first.
+
+`-s`: Indicates that the following argument specifies a radiosonde site. The codes for each site can be found in <a href="https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-station-list.txt">the IGRA2 station list</a> or on <a href="https://www.spc.noaa.gov/exper/soundings/">the SPC Experimental Soundings page</a>.
+
+`-d`: For historical data, specifies that the following argument is a date. The format YYYYMMDD-HH should be used. Always use UTC time.
+
+If you want to get the current sounding for Fort Worth, Texas, type `java -jar RadiosondeViewer.jar -c -s KFWD`.
+
+If you want to get the historical sounding for Norman, Oklahoma on February 27, 2022 at 03Z, type `java -jar RadiosondeViewer.jar -h -s KOUN -d 20230227-03`.
+
+# How to use the API in your own Java projects
+
+Include the JAR file in your project's build path. It is the same jar file as the GUI and the CLI.
+
+First, select a radiosonde site with `RadiosondeSite.findSite(String code);`, where the codes for each site can be found in <a href="https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-station-list.txt">the IGRA2 station list</a> or on <a href="https://www.spc.noaa.gov/exper/soundings/">the SPC Experimental Soundings page</a>.
+
+To get a current sounding from within the Contiguous US, use `RadiosondeWrapper.displaySpcExperSounding(RadiosondeSite site)` and the program will display the most current sounding from the SPC Experimental Soundings page.
+
+To get a historical sounding from anywhere in the world, use `RadiosondeWrapper.displaySounding(RadiosondeSite site, int year, int month, int day, int hour)` and the program will display the sounding from that site at either that time or the closest time found near the requested time. If no sounding is found, the method will throw a `RadiosondeNotFoundException` so you may write your own error handling. No specific error handling is needed, but it gives the programmer the option to show a GUI dialog box, a console message, or any other handling.
+
+# How to Create soundings using your own data
 Step 1: Enter your data into arrays of type `double[]` using SI units. Currently, the needed arrays are pressure, height, temperature, dewpoint, zonal (east-west) wind, and meridional (north-south) wind. Vertical velocity may be included but is optional. Enter your data in the arrays in order of increasing pressure. The lowest pressure (highest altitude) record should be contained in the first index of each array and the highest pressure (lowest altitude) record should be contained in the last index.
 
 Take care not to use relative humidity in the dewpoint array. If you need, WeatherUtils.relativeHumidity(double temperature, double dewpoint) can convert your data.
