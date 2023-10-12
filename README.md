@@ -1,4 +1,4 @@
-![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/7f550b1b-b704-4eeb-86ca-7197aebe8adb)# sounding-viewer-java
+# sounding-viewer-java
 A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear. Exists both as a standalone program and as an API. 
 
 To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.0.0.
