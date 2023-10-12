@@ -1,4 +1,4 @@
-# sounding-viewer-java
+![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/7f550b1b-b704-4eeb-86ca-7197aebe8adb)# sounding-viewer-java
 A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear. Exists both as a standalone program and as an API. 
 
 To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.0.0.
@@ -89,5 +89,8 @@ new SoundingFrame("Amarillo TX Weather Balloon", sounding, time, 35.2331, -101.7
 
 I have also made a MapInset interface that allows for a map to be shown in the upper-rightmost frame. RadarView uses it to display radar data near the sounding to give context for the storm's environment. I plan to write a guide on how to use that interface later on.
 
-![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/c3752d74-35af-473c-9182-737f31c87b67)
+![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/98c85b0a-8b2d-406e-aaa5-ff2d3b7a473a)
+![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/1ca5b043-07c0-411c-b93d-99a4491b3619)
+
+
 
