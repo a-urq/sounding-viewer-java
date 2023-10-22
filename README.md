@@ -1,9 +1,9 @@
 # sounding-viewer-java
 A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear. Exists both as a standalone program and as an API. 
 
-To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.0.0.
+To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.1.0.
 
-Be advised that integration with IGRA2 soundings from outside of the US is currently having issues.
+Be advised that integration with IGRA2 soundings from outside of the US is currently not well tested and has had issues in the past. Please let me know if you encounter any issues.
 
 # Dependencies
 These dependencies are only needed if you are downloading the source code. If you are downloading the release JAR file, you do not need to worry about installing these libraries.
@@ -93,6 +93,15 @@ I have also made a MapInset interface that allows for a map to be shown in the u
 
 ![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/98c85b0a-8b2d-406e-aaa5-ff2d3b7a473a)
 ![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/1ca5b043-07c0-411c-b93d-99a4491b3619)
+
+# New Feature: Thermal Wind and Inferred Temperature Advection
+A few weeks before the time of writing, my Atmospheric Circulations class covered the Thermal Wind Equation. It's a fairly complicated equation to wrap your head around, but in short, you can relate the change in wind speed and direction with altitude (in more technical terms, the wind shear vector) with the temperature gradient. Using that temperature gradient from the Thermal Wind Equation, you can factor in the wind speed to calculate the inferred temperature advection. 
+
+It is not an exact method of determining advection, but it is very useful in cases where you have no direct measurements of the temperature gradient, such as weather balloon data.
+
+I have used the Thermal Wind Equation to create an Inferred Temperature Advection plot on my sounding charts. In this example, you can see a layer of Warm Air Advection in Southwest Kansas.
+
+![image](https://github.com/a-urq/sounding-viewer-java/assets/114271919/d29aff5c-ceba-4cd9-a451-6f6ea0e637a0)
 
 
 
