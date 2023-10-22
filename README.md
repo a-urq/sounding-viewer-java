@@ -6,6 +6,8 @@ To download, follow instructions at https://github.com/a-urq/sounding-viewer-jav
 Be advised that integration with IGRA2 soundings from outside of the US is currently having issues.
 
 # Dependencies
+These dependencies are only needed if you are downloading the source code. If you are downloading the release JAR file, you do not need to worry about installing these libraries.
+
 joda-time
 
 WeatherUtils (https://github.com/a-urq/weather-utils-java)
