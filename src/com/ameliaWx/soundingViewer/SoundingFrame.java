@@ -215,7 +215,7 @@ public class SoundingFrame extends JFrame {
 
 	private HazType[] hazType = new HazType[3];
 
-	private SoundingGraphics g;
+	private SoundingGraphics sg;
 	private MapInset mapInset;
 
 	private static HashMap<PrecipitationType, String> ptypeNames = new HashMap<>();
@@ -268,7 +268,8 @@ public class SoundingFrame extends JFrame {
 	}
 
 	public SoundingFrame(String soundingSource, Sounding sounding0, DateTime time0, Sounding soundingM, DateTime timeM,
-			Sounding sounding1, DateTime time1, double lat, double lon, double windOffsetAngle, MapInset mapInset) {
+			Sounding sounding1, DateTime time1, double lat, double lon, double windOffsetAngle, MapInset mapInset, 
+			JFrame parentFrame) {
 		this.soundingSource = soundingSource;
 
 		this.lat = lat;
@@ -280,15 +281,15 @@ public class SoundingFrame extends JFrame {
 		this.windOffsetAngle = windOffsetAngle;
 
 		this.setSize(1750, 900);
-		this.setLocationRelativeTo(null);
+		this.setLocationRelativeTo(parentFrame);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		this.setTitle(generateTitle(this.timeM));
 
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		g = new SoundingGraphics();
-		this.add(g);
+		sg = new SoundingGraphics();
+		this.add(sg);
 
 		this.addKeyListener(new SoundingKeyListener());
 
@@ -645,8 +646,46 @@ public class SoundingFrame extends JFrame {
 		hazType[1] = determineHazType();
 	}
 
+	public SoundingFrame(Sounding soundingM, JFrame parentFrame) {
+		this("", soundingM, null, -1024.0, -1024.0, 0, null, parentFrame);
+	}
+
+	public SoundingFrame(Sounding soundingM, DateTime d, JFrame parentFrame) {
+		this("", soundingM, d, -1024.0, -1024.0, 0, null, parentFrame);
+	}
+
+	public SoundingFrame(Sounding soundingM, DateTime timeM, double lat, double lon, JFrame parentFrame) {
+		this("", soundingM, timeM, lat, lon, 0, null, parentFrame);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding soundingM, JFrame parentFrame) {
+		this(soundingSource, soundingM, null, -1024.0, -1024.0, 0, null, parentFrame);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon, JFrame parentFrame) {
+		this(soundingSource, soundingM, timeM, lat, lon, 0, null, parentFrame);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon,
+			MapInset mapInset, JFrame parentFrame) {
+		this(soundingSource, soundingM, timeM, lat, lon, 0, mapInset, parentFrame);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon,
+			double windOffsetAngle, MapInset mapInset, JFrame parentFrame) {
+		this(soundingSource, null, null, soundingM, timeM, null, null, lat, lon, windOffsetAngle, mapInset, parentFrame);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding sounding0, DateTime time0, Sounding soundingM, DateTime timeM,
+			Sounding sounding1, DateTime time1, double lat, double lon, double windOffsetAngle, MapInset mapInset) {
+	}
+
 	public SoundingFrame(Sounding soundingM) {
 		this("", soundingM, null, -1024.0, -1024.0, 0, null);
+	}
+
+	public SoundingFrame(Sounding soundingM, DateTime d) {
+		this("", soundingM, d, -1024.0, -1024.0, 0, null);
 	}
 
 	public SoundingFrame(Sounding soundingM, DateTime timeM, double lat, double lon) {
@@ -658,7 +697,10 @@ public class SoundingFrame extends JFrame {
 	}
 
 	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon) {
-		this(soundingSource, soundingM, timeM, lat, lon, 0, null);
+//		String soundingSource, Sounding sounding0, DateTime time0, Sounding soundingM, DateTime timeM,
+//		Sounding sounding1, DateTime time1, double lat, double lon, double windOffsetAngle, MapInset mapInset, 
+//		JFrame parentFrame
+		this(soundingSource, soundingM, timeM, lat, lon, 0, null, null);
 	}
 
 	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon,
@@ -675,6 +717,27 @@ public class SoundingFrame extends JFrame {
 	private int activeReadoutSet = 1;
 
 	private int stormMotionVector = 2; // 0 = LM, 1 = MW, 2 = RM
+	
+	public BufferedImage printChart(int width, int height, String text) {
+		System.out.println(sg);
+		BufferedImage chart = sg.drawSoundingChart(width, height);
+		
+		BufferedImage bg = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics g = bg.createGraphics();
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
+		g.drawImage(chart, 0, 0, null);
+		
+		g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
+		
+		g.setColor(Color.WHITE);
+		drawCenteredString(text, (Graphics2D) g, width/2, 20);
+		
+		g.dispose();
+		return bg;
+	}
 
 	private class SoundingGraphics extends JComponent {
 		private static final long serialVersionUID = 1649550301315411744L;
@@ -700,12 +763,12 @@ public class SoundingFrame extends JFrame {
 		private static final String AUTHOR_MESSAGE = "MADE BY AMELIA URQUHART | PRESS 'C' FOR CONTROLS";
 
 		private BufferedImage drawSoundingChart(int width, int height) {
-			double scaleW = width / 1750.0;
+			double scaleW = width / 1850.0;
 			double scaleH = height / 900.0;
 
 			double scale = Double.min(scaleW, scaleH);
 
-			BufferedImage chart = new BufferedImage((int) (1750 * scale), (int) (900 * scale),
+			BufferedImage chart = new BufferedImage((int) (1850 * scale), (int) (900 * scale),
 					BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = chart.createGraphics();
 			g.setStroke(thickStroke);
@@ -717,59 +780,66 @@ public class SoundingFrame extends JFrame {
 			g.drawImage(skewT, (int) (50 * scale), (int) (50 * scale), (int) (850 * scale), (int) (850 * scale), 0, 0,
 					skewT.getWidth(), skewT.getHeight(), null);
 
+			BufferedImage tempAdvection = drawTemperatureAdvection(scale);
+			g.drawImage(tempAdvection, (int) (875 * scale), (int) (50 * scale), (int) (950 * scale), (int) (850 * scale),
+					0, 0, tempAdvection.getWidth(), tempAdvection.getHeight(), null);
+
 			BufferedImage hodograph = drawHodograph(scale);
-			g.drawImage(hodograph, (int) (875 * scale), (int) (50 * scale), (int) (1275 * scale), (int) (450 * scale),
+			g.drawImage(hodograph, (int) (975 * scale), (int) (50 * scale), (int) (1375 * scale), (int) (450 * scale),
 					0, 0, hodograph.getWidth(), hodograph.getHeight(), null);
 
 			if (mapInset != null) {
 				BufferedImage mapInsetImg = mapInset.drawMapInset(lat, lon, 1, (int) (400 * scale));
-				g.drawImage(mapInsetImg, (int) (1300 * scale), (int) (50 * scale), (int) (1700 * scale),
+				g.drawImage(mapInsetImg, (int) (1400 * scale), (int) (50 * scale), (int) (1800 * scale),
 						(int) (450 * scale), 0, 0, mapInsetImg.getWidth(), mapInsetImg.getHeight(), null);
 			}
 
 			BufferedImage stormSlinky = drawStormSlinky(scale);
-			g.drawImage(stormSlinky, (int) (875 * scale), (int) (475 * scale), (int) (1062.5 * scale),
+			g.drawImage(stormSlinky, (int) (975 * scale), (int) (475 * scale), (int) (1162.5 * scale),
 					(int) (650 * scale), 0, 0, stormSlinky.getWidth(), stormSlinky.getHeight(), null);
 
 			BufferedImage streamwiseVorticity = drawVorticityPlot(scale);
-			g.drawImage(streamwiseVorticity, (int) (875 * scale), (int) (675 * scale), (int) (1062.5 * scale),
+			g.drawImage(streamwiseVorticity, (int) (975 * scale), (int) (675 * scale), (int) (1162.5 * scale),
 					(int) (850 * scale), 0, 0, streamwiseVorticity.getWidth(), streamwiseVorticity.getHeight(), null);
 
 			BufferedImage severeReadouts = drawSevereReadouts(scale);
-			g.drawImage(severeReadouts, (int) (1087.5 * scale), (int) (475 * scale), (int) (1487.5 * scale),
+			g.drawImage(severeReadouts, (int) (1187.5 * scale), (int) (475 * scale), (int) (1587.5 * scale),
 					(int) (850 * scale), 0, 0, severeReadouts.getWidth(), severeReadouts.getHeight(), null);
 
 			BufferedImage winterReadouts = drawWinterReadouts(scale);
-			g.drawImage(winterReadouts, (int) (1512.5 * scale), (int) (475 * scale), (int) (1700 * scale),
+			g.drawImage(winterReadouts, (int) (1612.5 * scale), (int) (475 * scale), (int) (1800 * scale),
 					(int) (650 * scale), 0, 0, winterReadouts.getWidth(), winterReadouts.getHeight(), null);
 
 			BufferedImage hazardType = drawHazardType(scale);
-			g.drawImage(hazardType, (int) (1512.5 * scale), (int) (675 * scale), (int) (1700 * scale),
+			g.drawImage(hazardType, (int) (1612.5 * scale), (int) (675 * scale), (int) (1800 * scale),
 					(int) (850 * scale), 0, 0, hazardType.getWidth(), hazardType.getHeight(), null);
 
 			// skew-t frame
 			g.drawRect((int) (50 * scale), (int) (50 * scale), (int) (800 * scale), (int) (800 * scale));
+			
+			// temperature advection frame
+			g.drawRect((int) (875 * scale), (int) (50 * scale), (int) (75 * scale), (int) (800 * scale));
 
 			// hodograph frame
-			g.drawRect((int) (875 * scale), (int) (50 * scale), (int) (400 * scale), (int) (400 * scale));
+			g.drawRect((int) (975 * scale), (int) (50 * scale), (int) (400 * scale), (int) (400 * scale));
 
 			// map inset frame
-			g.drawRect((int) (1300 * scale), (int) (50 * scale), (int) (400 * scale), (int) (400 * scale));
+			g.drawRect((int) (1400 * scale), (int) (50 * scale), (int) (400 * scale), (int) (400 * scale));
 
 			// storm slinky frame
-			g.drawRect((int) (875 * scale), (int) (475 * scale), (int) (187.5 * scale), (int) (175 * scale));
+			g.drawRect((int) (975 * scale), (int) (475 * scale), (int) (187.5 * scale), (int) (175 * scale));
 
 			// streamwise vorticity frame
-			g.drawRect((int) (875 * scale), (int) (675 * scale), (int) (187.5 * scale), (int) (175 * scale));
+			g.drawRect((int) (975 * scale), (int) (675 * scale), (int) (187.5 * scale), (int) (175 * scale));
 
 			// severe readout frame
-			g.drawRect((int) (1087.5 * scale), (int) (475 * scale), (int) (400 * scale), (int) (375 * scale));
+			g.drawRect((int) (1187.5 * scale), (int) (475 * scale), (int) (400 * scale), (int) (375 * scale));
 
 			// winter readout frame
-			g.drawRect((int) (1512.5 * scale), (int) (475 * scale), (int) (187.5 * scale), (int) (175 * scale));
+			g.drawRect((int) (1612.5 * scale), (int) (475 * scale), (int) (187.5 * scale), (int) (175 * scale));
 
 			// haz type frame
-			g.drawRect((int) (1512.5 * scale), (int) (675 * scale), (int) (187.5 * scale), (int) (175 * scale));
+			g.drawRect((int) (1612.5 * scale), (int) (675 * scale), (int) (187.5 * scale), (int) (175 * scale));
 
 			// skew-t labels
 			if (scale > 0.693) {
@@ -783,9 +853,12 @@ public class SoundingFrame extends JFrame {
 					drawCenteredString(i + "C", g, x, (int) (860 * scale));
 				}
 			}
+			
+			// temp advection label
+			drawCenteredString("K hr^-1", g, (int) (912.5 * scale), (int) (860 * scale));
 
 			// hodograph label
-			drawCenteredString("1 RING = 10 KT", g, (int) (1075 * scale), (int) (460 * scale));
+			drawCenteredString("1 RING = 10 KT", g, (int) (1175 * scale), (int) (460 * scale));
 
 			// time labels
 			g.setColor(Color.WHITE);
@@ -1257,6 +1330,82 @@ public class SoundingFrame extends JFrame {
 			}
 
 			return skewT;
+		}
+
+		private static final double THERMAL_WIND_DP = 5000;
+		private BufferedImage drawTemperatureAdvection(double scale) {
+			BufferedImage advection = new BufferedImage((int) (75 * scale), (int) (800 * scale),
+					BufferedImage.TYPE_4BYTE_ABGR);
+			Graphics2D g = advection.createGraphics();
+			g.setStroke(thickStroke);
+			g.setFont(CAPTION_FONT);
+
+			double[] pressure = activeSounding.getPressureLevels();
+			double[] height = activeSounding.getHeight();
+			double[] uWind = activeSounding.getUWind();
+			double[] vWind = activeSounding.getVWind();
+			
+			double surfacePressure = pressure[pressure.length - 1];
+			
+			ArrayList<Double> temperatureAdvection = new ArrayList<>();
+			ArrayList<Double> lowerLimits = new ArrayList<>();
+			ArrayList<Double> upperLimits = new ArrayList<>();
+			
+			double tempAdvMax = 0.0;
+			
+			for(double i = 10000; i < 100000; i += THERMAL_WIND_DP) {
+				double upperLimitPres = i;
+				double lowerLimitPres = i + THERMAL_WIND_DP;
+
+				if(upperLimitPres > surfacePressure) {
+					break;
+				}
+				
+				if(lowerLimitPres > surfacePressure) {
+					lowerLimitPres = surfacePressure;
+				}
+				
+//				System.out.println(upperLimitPres);
+//				System.out.println(lowerLimitPres);
+				
+				double tempAdv = WeatherUtils.inferredTemperatureAdvection(pressure, height, uWind, vWind, lat, upperLimitPres, lowerLimitPres);
+				
+				temperatureAdvection.add(tempAdv * 3600);
+				lowerLimits.add(lowerLimitPres);
+				upperLimits.add(upperLimitPres);
+				
+				tempAdvMax = Double.max(Math.abs(tempAdvMax), Math.abs(tempAdv * 3600));
+			}
+			
+//			System.out.println(tempAdvMax);
+
+			g.setColor(Color.GRAY);
+			g.drawLine((int) (37.5 * scale), (int) (0 * scale), (int) (37.5 * scale), (int) (800 * scale));
+			
+			double tempAdvScaleMax = Double.max(1.2 * tempAdvMax, 3);
+			for (int i = 0; i < temperatureAdvection.size(); i++) {
+				double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(upperLimits.get(i)));
+				double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(lowerLimits.get(i)));
+				
+//				System.out.printf("%5.2fK hr^-1 %6.1f mb %6.1f mb\n", temperatureAdvection.get(i), upperLimits.get(i)/100.0, lowerLimits.get(i)/100.0);
+
+				double x1 = 37.5;
+				double x2 = linScale(-tempAdvScaleMax, tempAdvScaleMax, 0, 75, temperatureAdvection.get(i));
+				
+				if(x2 < x1) {
+					g.setColor(new Color(64, 64, 255));
+					g.drawRect((int) (x2 * scale), (int) (y1 * scale), (int) ((x1 - x2) * scale), (int) ((y2 - y1) * scale));
+					drawCenteredString(String.format("%3.1f", temperatureAdvection.get(i)), g, (int) (scale*23*x1/16.0), (int) (scale*(y1+y2)/2.0));
+				} else {
+					g.setColor(new Color(255, 0, 0));
+					g.drawRect((int) (x1 * scale), (int) (y1 * scale), (int) ((x2 - x1) * scale), (int) ((y2 - y1) * scale));
+					drawCenteredString(String.format("%3.1f", temperatureAdvection.get(i)), g, (int) (scale * x1/2.0), (int) (scale*(y1+y2)/2.0));
+				}
+			}
+			
+			g.dispose();
+			
+			return advection;
 		}
 
 		private BufferedImage drawHodograph(double scale) {
@@ -2387,10 +2536,15 @@ public class SoundingFrame extends JFrame {
 			drawLeftCenterAlignedString((int) (xArr.size() * dT) + " s", g, (int) (5 * scale), (int) (8 * scale));
 
 			// updraft tilt
-			double updraftHeight = zArr.get(zArr.size() - 1) - zArr.get(0);
-
-			double deltaX = xArr.get(xArr.size() - 1) - xArr.get(0);
-			double deltaY = yArr.get(yArr.size() - 1) - yArr.get(0);
+			double updraftHeight = 0;
+			double deltaX = 0;
+			double deltaY = 0;
+			if(zArr.size() > 0) {
+				updraftHeight = zArr.get(zArr.size() - 1) - zArr.get(0);
+				deltaX = xArr.get(xArr.size() - 1) - xArr.get(0);
+				deltaY = yArr.get(yArr.size() - 1) - yArr.get(0);
+			}
+			
 			double updraftTopOffset = Math.hypot(deltaX, deltaY);
 
 			double updraftTilt = Math.toDegrees(Math.atan2(updraftTopOffset, updraftHeight));
@@ -2545,7 +2699,7 @@ public class SoundingFrame extends JFrame {
 
 					setTitle(generateTitle(time0));
 
-					g.repaint();
+					sg.repaint();
 				}
 				break;
 			case KeyEvent.VK_2:
@@ -2555,7 +2709,7 @@ public class SoundingFrame extends JFrame {
 
 					setTitle(generateTitle(timeM));
 
-					g.repaint();
+					sg.repaint();
 				}
 				break;
 			case KeyEvent.VK_3:
@@ -2565,7 +2719,7 @@ public class SoundingFrame extends JFrame {
 
 					setTitle(generateTitle(time1));
 
-					g.repaint();
+					sg.repaint();
 				}
 				break;
 			case KeyEvent.VK_C:
@@ -2573,15 +2727,15 @@ public class SoundingFrame extends JFrame {
 				break;
 			case KeyEvent.VK_E:
 				showEntrainment = !showEntrainment;
-				g.repaint();
+				sg.repaint();
 				break;
 			case KeyEvent.VK_P:
 				selectParcelPathType();
-				g.repaint();
+				sg.repaint();
 				break;
 			case KeyEvent.VK_S:
 				selectStormMotionVector();
-				g.repaint();
+				sg.repaint();
 				break;
 			}
 		}

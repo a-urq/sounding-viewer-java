@@ -197,7 +197,7 @@ public class RadiosondeWrapper {
 	}
 	
 	private static DateTime selectDateGui() {
-		String dateStr = (String) JOptionPane.showInputDialog(null, "What date and time would you like to see? Use format YYYYMMDD-HH.", 
+		String dateStr = (String) JOptionPane.showInputDialog(null, "What date and time would you like to see? Use format YYYYMMDD-HH and be sure to use UTC.", 
 				"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE);
 		
 		int yyyy = Integer.valueOf(dateStr.substring(0, 4));
@@ -442,6 +442,7 @@ public class RadiosondeWrapper {
 			String heightStr = line.substring(16, 21);
 			String temperatureStr = line.substring(23, 27);
 			String relativeHumidityStr = line.substring(28, 33);
+			String dewpointDepressionStr = line.substring(34, 39);
 			String windDirectionStr = line.substring(41, 45);
 			String windSpeedStr = line.substring(47, 51);
 
@@ -449,19 +450,27 @@ public class RadiosondeWrapper {
 			double height_ = Double.valueOf(heightStr);
 			double temperature_ = Double.valueOf(temperatureStr) / 10.0 + 273.15;
 			double relativeHumidity_ = Double.valueOf(relativeHumidityStr) / 1000.0;
+			double dewpointDepression_ = Double.valueOf(dewpointDepressionStr) / 10.0;
 			double windDirection_ = Double.valueOf(windDirectionStr) + 180.0;
 			double windSpeed_ = Double.valueOf(windSpeedStr) / 10.0;
 			
-			if(temperature_ >= 130 && relativeHumidity_ < -1) {
-//				System.out.println(relativeHumidity_);
-				relativeHumidity_ = 0.001;
-			}
+//			if(temperature_ >= 130 && relativeHumidity_ < -1) {
+////				System.out.println(relativeHumidity_);
+//				relativeHumidity_ = 0.001;
+//			}
 			
 			if(i == lines.size() -1 && height_ < -1) {
 				height_ = 0;
 			}
 
-			double dewpoint_ = WeatherUtils.dewpoint(temperature_, relativeHumidity_);
+			double dewpoint_ = 0.0;
+			if(relativeHumidity_ > 0) {
+				dewpoint_ = WeatherUtils.dewpoint(temperature_, relativeHumidity_);
+			} else if (dewpointDepression_ > -100){
+				dewpoint_ = temperature_ - dewpointDepression_;
+			} else {
+				dewpoint_ = 0;
+			}
 
 			double uWind_ = Math.sin(Math.toRadians(windDirection_)) * windSpeed_;
 			double vWind_ = Math.cos(Math.toRadians(windDirection_)) * windSpeed_;
