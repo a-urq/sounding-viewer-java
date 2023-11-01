@@ -47,6 +47,11 @@ import com.ameliaWx.weatherUtils.RecordAtLevel;
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class SoundingFrame extends JFrame {
+	// IMPLEMENT WHENEVER YOU HAVE TIME
+	private void outputAsCM1Sounding() {
+		// MAKE GUI DIRECTORY SELECTOR
+	}
+	
 	private static final long serialVersionUID = 396540838404275479L;
 
 	public static String dataFolder = System.getProperty("user.home") + "/Documents/SoundingViewer/data/";
@@ -68,6 +73,7 @@ public class SoundingFrame extends JFrame {
 	private ParcelPath pathType = ParcelPath.INFLOW_LAYER;
 	
 	private boolean showEntrainment = false;
+	private boolean showFrostPoint = false;
 
 	private boolean parcelPathVisible = true;
 	@SuppressWarnings("unchecked")
@@ -889,7 +895,7 @@ public class SoundingFrame extends JFrame {
 						g.setFont(normalFont);
 					}
 
-					drawCenteredString(timeString(time), g, (int) ((1750 * scale * (i + 1)) / 4), (int) (25 * scale));
+					drawCenteredString(timeString(time), g, (int) ((1850 * scale * (i + 1)) / 4), (int) (25 * scale));
 				}
 			}
 
@@ -913,6 +919,7 @@ public class SoundingFrame extends JFrame {
 			double[] temperature = activeSounding.getTemperature();
 			double[] wetbulb = activeSounding.getWetbulb();
 			double[] dewpoint = activeSounding.getDewpoint();
+			double[] frostPoint = activeSounding.getFrostPoint();
 
 			double[] virtTemp = new double[dewpoint.length];
 
@@ -1094,6 +1101,16 @@ public class SoundingFrame extends JFrame {
 
 					g.drawLine((int) ((x1W + skew1) * scale), (int) (y1 * scale), (int) ((x2W + skew2) * scale),
 							(int) (y2 * scale));
+
+					if(showFrostPoint) {
+						g.setStroke(thickStroke);
+						g.setColor(new Color(0, 196, 128));
+						double x1F = linScale(223.15, 323.15, 0, 800, frostPoint[i]);
+						double x2F = linScale(223.15, 323.15, 0, 800, frostPoint[i + 1]);
+
+						drawDashedLine(g, (int) ((x1F + skew1) * scale), (int) (y1 * scale), (int) ((x2F + skew2) * scale),
+								(int) (y2 * scale), 10);
+					}
 
 					g.setStroke(thickStroke);
 					g.setColor(new Color(0, 255, 0));
@@ -2727,6 +2744,10 @@ public class SoundingFrame extends JFrame {
 				break;
 			case KeyEvent.VK_E:
 				showEntrainment = !showEntrainment;
+				sg.repaint();
+				break;
+			case KeyEvent.VK_F:
+				showFrostPoint = !showFrostPoint;
 				sg.repaint();
 				break;
 			case KeyEvent.VK_P:

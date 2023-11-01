@@ -7,6 +7,7 @@ public class Sounding {
 	private double[] temperature;
 	private double[] wetbulb;
 	private double[] dewpoint;
+	private double[] frostPoint;
 	private double[] height;
 	private double[] uWind;
 	private double[] vWind;
@@ -19,6 +20,7 @@ public class Sounding {
 	
 	public Sounding(double[] pressureLevels, double[] temperature, double[] dewpoint, double[] height,
 			double[] uWind, double[] vWind, double[] wWind) {
+//		System.out.println("entering constructor");
 		this.pressureLevels = pressureLevels;
 		this.temperature = temperature;
 		this.dewpoint = dewpoint;
@@ -31,6 +33,13 @@ public class Sounding {
 		
 		for(int i = 0; i < wetbulb.length; i++) {
 			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
+		}
+		
+		frostPoint = new double[dewpoint.length];
+
+		for(int i = 0; i < frostPoint.length; i++) {
+			frostPoint[i] = WeatherUtils.frostPointFromDewpoint(dewpoint[i]);
+//			System.out.println("assigning frost points");
 		}
 	}
 	
@@ -53,6 +62,13 @@ public class Sounding {
 		
 		for(int i = 0; i < wetbulb.length; i++) {
 			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
+		}
+		
+		frostPoint = new double[dewpoint.length];
+
+		for(int i = 0; i < frostPoint.length; i++) {
+			frostPoint[i] = WeatherUtils.frostPointFromDewpoint(dewpoint[i]);
+//			System.out.println("assigning frost points");
 		}
 	}
 	
@@ -80,6 +96,10 @@ public class Sounding {
 
 	public double[] getDewpoint() {
 		return dewpoint;
+	}
+
+	public double[] getFrostPoint() {
+		return frostPoint;
 	}
 
 	public double[] getHeight() {
