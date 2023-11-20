@@ -30,6 +30,7 @@ import org.joda.time.DateTimeZone;
 
 import com.ameliaWx.soundingViewer.Sounding;
 import com.ameliaWx.soundingViewer.SoundingFrame;
+import com.ameliaWx.soundingViewer.unixTool.nwp.ModelDerived;
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class RadiosondeWrapper {
@@ -111,12 +112,17 @@ public class RadiosondeWrapper {
 			if (site.getFourLetterCode().length() > 0) {
 				RadiosondeWrapper.displayCurrentSounding(site);
 			} else {
-				try {
-					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
-				} catch (RadiosondeNotFoundException e) {
-					e.printStackTrace();
-					System.exit(0);
-				}
+				Sounding gfs = ModelDerived.getGfsSounding(site.getLatitude(), site.getLongitude());
+				
+				new SoundingFrame(site.locationString() + " GFS-Derived", gfs, DateTime.now(DateTimeZone.UTC), 33,
+						-96.5);
+				
+//				try {
+//					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
+//				} catch (RadiosondeNotFoundException e) {
+//					e.printStackTrace();
+//					System.exit(0);
+//				}
 			}
 		} else if (currHistOption == 1) {
 			RadiosondeSite site = selectSiteGui(false);

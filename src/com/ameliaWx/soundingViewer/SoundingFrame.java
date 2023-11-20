@@ -114,11 +114,6 @@ public class SoundingFrame extends JFrame {
 	private double[] muLcl = new double[3];
 	private double[] ilLcl = new double[3];
 
-	private double[] sbCcl = new double[3];
-	private double[] mlCcl = new double[3];
-	private double[] muCcl = new double[3];
-	private double[] ilCcl = new double[3];
-
 	private double[] sbLfc = new double[3];
 	private double[] mlLfc = new double[3];
 	private double[] muLfc = new double[3];
@@ -128,6 +123,11 @@ public class SoundingFrame extends JFrame {
 	private double[] mlEl = new double[3];
 	private double[] muEl = new double[3];
 	private double[] ilEl = new double[3];
+
+	private double[] sbMpl = new double[3];
+	private double[] mlMpl = new double[3];
+	private double[] muMpl = new double[3];
+	private double[] ilMpl = new double[3];
 	
 	private double[] sbecape = new double[3];
 	private double[] mlecape = new double[3];
@@ -144,11 +144,6 @@ public class SoundingFrame extends JFrame {
 	private double[] muELcl = new double[3];
 	private double[] ilELcl = new double[3];
 
-	private double[] sbECcl = new double[3];
-	private double[] mlECcl = new double[3];
-	private double[] muECcl = new double[3];
-	private double[] ilECcl = new double[3];
-
 	private double[] sbELfc = new double[3];
 	private double[] mlELfc = new double[3];
 	private double[] muELfc = new double[3];
@@ -158,6 +153,11 @@ public class SoundingFrame extends JFrame {
 	private double[] mlEEl = new double[3];
 	private double[] muEEl = new double[3];
 	private double[] ilEEl = new double[3];
+
+	private double[] sbEMpl = new double[3];
+	private double[] mlEMpl = new double[3];
+	private double[] muEMpl = new double[3];
+	private double[] ilEMpl = new double[3];
 
 	private double[] muLpl = new double[3];
 
@@ -405,15 +405,6 @@ public class SoundingFrame extends JFrame {
 				mlLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayer[i]);
 				muLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstable[i]);
 
-				sbCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
-				ilCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
-				mlCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
-				muCcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
-
 				sbLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
 				mlLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
@@ -430,6 +421,15 @@ public class SoundingFrame extends JFrame {
 				mlEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 				muEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+
+				sbMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				ilMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+				mlMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				muMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
 
 				sbecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
@@ -455,15 +455,6 @@ public class SoundingFrame extends JFrame {
 				mlELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayerEntr[i]);
 				muELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstableEntr[i]);
 
-				sbECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ilECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
-				mlECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
-				muECcl[i] = WeatherUtils.convectiveCondensationLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
-
 				sbELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
 				ilELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
@@ -480,6 +471,15 @@ public class SoundingFrame extends JFrame {
 				mlEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
 				muEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				dcape[i] = WeatherUtils.computeDcape(activeSounding.getPressureLevels(),
@@ -1827,14 +1827,6 @@ public class SoundingFrame extends JFrame {
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, mlLcl_, muLcl_, ilLcl_),
 						(int) (45 * scale), (int) (60 * scale));
 	
-				String sbCcl_ = String.format("%5.2f", sbECcl[activeReadoutSet] / 1000.0);
-				String ilCcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilECcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
-				String mlCcl_ = String.format("%5.2f", mlECcl[activeReadoutSet] / 1000.0);
-				String muCcl_ = String.format("%5.2f", (muECcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
-	
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, mlCcl_, muCcl_, ilCcl_),
-						(int) (45 * scale), (int) (75 * scale));
-	
 				String sbLfc_ = (sbecape[activeReadoutSet] > 0) ? String.format("%5.2f", sbELfc[activeReadoutSet] / 1000.0)
 						: "-";
 				String ilLfc_ = (ilecape[activeReadoutSet] > 0)
@@ -1848,7 +1840,7 @@ public class SoundingFrame extends JFrame {
 						: "-";
 	
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, mlLfc_, muLfc_, ilLfc_),
-						(int) (45 * scale), (int) (90 * scale));
+						(int) (45 * scale), (int) (75 * scale));
 	
 				String sbEl_ = (sbecape[activeReadoutSet] > 0) ? String.format("%5.2f", sbEEl[activeReadoutSet] / 1000.0)
 						: "-";
@@ -1863,6 +1855,32 @@ public class SoundingFrame extends JFrame {
 						: "-";
 	
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, mlEl_, muEl_, ilEl_),
+						(int) (45 * scale), (int) (90 * scale));
+
+				String sbMpl_ = (sbecape[activeReadoutSet] > 0)
+						? (sbEMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", sbEMpl[activeReadoutSet] / 1000.0)
+								: ">MAX")
+						: "-";
+				String ilMpl_ = (inflowLayer[activeReadoutSet][0] > -999) 
+						? ((ilecape[activeReadoutSet] > 0) ?
+								(ilEMpl[activeReadoutSet] > -999
+										? String.format("%5.2f", (ilEMpl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
+										: ">MAX")
+								: "-")
+						: "-";
+				String mlMpl_ = (mlecape[activeReadoutSet] > 0)
+						? (mlEMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", mlEMpl[activeReadoutSet] / 1000.0)
+								: ">MAX")
+						: "-";
+				String muMpl_ = (muecape[activeReadoutSet] > 0)
+						? (muEMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", (muEMpl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
+								: ">MAX")
+						: "-";
+	
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "MPL [km]", sbMpl_, mlMpl_, muMpl_, ilMpl_),
 						(int) (45 * scale), (int) (105 * scale));
 			} else {
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "", "SB", "ML", "MU", "IL"),
@@ -1889,14 +1907,6 @@ public class SoundingFrame extends JFrame {
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, mlLcl_, muLcl_, ilLcl_),
 						(int) (45 * scale), (int) (60 * scale));
 
-				String sbCcl_ = String.format("%5.2f", sbCcl[activeReadoutSet] / 1000.0);
-				String ilCcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilCcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
-				String mlCcl_ = String.format("%5.2f", mlCcl[activeReadoutSet] / 1000.0);
-				String muCcl_ = String.format("%5.2f", (muCcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
-
-				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "CCL [km]", sbCcl_, mlCcl_, muCcl_, ilCcl_),
-						(int) (45 * scale), (int) (75 * scale));
-
 				String sbLfc_ = (sbcape[activeReadoutSet] > 0) ? String.format("%5.2f", sbLfc[activeReadoutSet] / 1000.0)
 						: "-";
 				String ilLfc_ = (ilcape[activeReadoutSet] > 0)
@@ -1910,7 +1920,7 @@ public class SoundingFrame extends JFrame {
 						: "-";
 
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LFC [km]", sbLfc_, mlLfc_, muLfc_, ilLfc_),
-						(int) (45 * scale), (int) (90 * scale));
+						(int) (45 * scale), (int) (75 * scale));
 
 				String sbEl_ = (sbcape[activeReadoutSet] > 0) ? String.format("%5.2f", sbEl[activeReadoutSet] / 1000.0)
 						: "-";
@@ -1925,6 +1935,32 @@ public class SoundingFrame extends JFrame {
 						: "-";
 
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "EL [km]", sbEl_, mlEl_, muEl_, ilEl_),
+						(int) (45 * scale), (int) (90 * scale));
+
+				String sbMpl_ = (sbcape[activeReadoutSet] > 0)
+						? (sbMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", sbMpl[activeReadoutSet] / 1000.0)
+								: ">MAX")
+						: "-";
+				String ilMpl_ = (inflowLayer[activeReadoutSet][0] > -999) 
+						? ((ilcape[activeReadoutSet] > 0) ?
+								(ilMpl[activeReadoutSet] > -999
+										? String.format("%5.2f", (ilMpl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0)
+										: ">MAX")
+								: "-")
+						: "-";
+				String mlMpl_ = (mlcape[activeReadoutSet] > 0)
+						? (mlMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", mlMpl[activeReadoutSet] / 1000.0)
+								: ">MAX")
+						: "-";
+				String muMpl_ = (mucape[activeReadoutSet] > 0)
+						? (muMpl[activeReadoutSet] > -999
+								? String.format("%5.2f", (muMpl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0)
+								: ">MAX")
+						: "-";
+
+				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "MPL [km]", sbMpl_, mlMpl_, muMpl_, ilMpl_),
 						(int) (45 * scale), (int) (105 * scale));
 			}
 
@@ -2016,9 +2052,9 @@ public class SoundingFrame extends JFrame {
 
 			g.drawString(String.format("%-9s%-9s", "DCAPE", dcape_), (int) (45 * scale), (int) (270 * scale));
 
-			String ebwd_ = String.format("%4.1f", ebwd[activeReadoutSet]);
+			String ebwd_ = String.format("%4.1f", ebwd[activeReadoutSet] / 0.5144444);
 
-			g.drawString(String.format("%-9s%-9s", "EBWD", ebwd_), (int) (45 * scale), (int) (285 * scale));
+			g.drawString(String.format("%-9s%-9s", "EBWD[kt]", ebwd_), (int) (45 * scale), (int) (285 * scale));
 
 			String scp_ = String.format("%4.1f", scp[activeReadoutSet]);
 

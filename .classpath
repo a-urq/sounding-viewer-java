@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/WeatherUtils"/>
 	<classpathentry kind="lib" path="/home/a-urq/eclipse-workspace/jarLibraries/joda-time-2.12.2.jar"/>
 	<classpathentry kind="lib" path="/home/a-urq/eclipse-workspace/jarLibraries/commons-io-2.7.jar"/>
+	<classpathentry kind="lib" path="/home/a-urq/eclipse-workspace/jarLibraries/netcdfAll-5.3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
