@@ -45,13 +45,21 @@ public class ModelDerived {
 		System.out.println("after aligning: " + now);
 		
 		Sounding gfsSounding = null;
-		while(true) {
+		for(int i = 0; i < 3; i++) {
 			try {
 				gfsSounding = getGfsSounding(lat, lon, now, 0);
 				break;
 			} catch (IOException e) {
 				System.err.println("GFS not found for " + now + ", rolling back 6 hours");
 				now = now.minusHours(6);
+				
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				continue;
 			}
 		}

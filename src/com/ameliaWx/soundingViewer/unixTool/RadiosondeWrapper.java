@@ -112,7 +112,15 @@ public class RadiosondeWrapper {
 			if (site.getFourLetterCode().length() > 0) {
 				RadiosondeWrapper.displayCurrentSounding(site);
 			} else {
+				JFrame init = new JFrame("Getting GFS data, this may take a few seconds...");
+				init.setSize(500, 0);
+				init.setLocationRelativeTo(null);
+				init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				init.setVisible(true);
+				
 				Sounding gfs = ModelDerived.getGfsSounding(site.getLatitude(), site.getLongitude());
+				
+				init.dispose();
 				
 				new SoundingFrame(site.locationString() + " GFS-Derived", gfs, DateTime.now(DateTimeZone.UTC), 33,
 						-96.5);
