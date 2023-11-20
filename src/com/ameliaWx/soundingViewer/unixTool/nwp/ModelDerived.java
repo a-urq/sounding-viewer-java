@@ -39,8 +39,10 @@ public class ModelDerived {
 
 	public static Sounding getGfsSounding(double lat, double lon) {
 		DateTime now = DateTime.now(DateTimeZone.UTC);
-		now.minusMinutes(now.getMinuteOfHour());
-		now.minusHours(now.getHourOfDay() % 6);
+		System.out.println("before aligning: " + now);
+		now = now.minusMinutes(now.getMinuteOfHour());
+		now = now.minusHours(now.getHourOfDay() % 6);
+		System.out.println("after aligning: " + now);
 		
 		Sounding gfsSounding = null;
 		while(true) {
