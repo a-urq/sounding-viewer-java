@@ -31,6 +31,7 @@ import org.joda.time.DateTimeZone;
 import com.ameliaWx.soundingViewer.Sounding;
 import com.ameliaWx.soundingViewer.SoundingFrame;
 import com.ameliaWx.soundingViewer.unixTool.nwp.ModelDerived;
+import com.ameliaWx.weatherUtils.UnitConversions;
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class RadiosondeWrapper {
@@ -45,6 +46,9 @@ public class RadiosondeWrapper {
 	}
 
 	public static void main(String[] args) {
+		System.out.println(UnitConversions.kelvinToFahrenheit(WeatherUtils.dewpoint(UnitConversions.fahrenheitToKelvin(66), 0.31)) + "F");
+		
+		System.exit(0);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -108,6 +112,8 @@ public class RadiosondeWrapper {
 	private static void doGuiCurrHist(int currHistOption) {
 		if (currHistOption == 0) {
 			RadiosondeSite site = selectSiteGui(true);
+			
+			System.out.println("FOUR LETTER CODE: " + site.getFourLetterCode());
 
 			if (site.getFourLetterCode().length() > 0) {
 				RadiosondeWrapper.displayCurrentSounding(site);
@@ -508,30 +514,6 @@ public class RadiosondeWrapper {
 		// ONLY FOR TESTING
 		// TAP OUT FOR CM1 SOUNDINGS
 		// WILL MAKE A BETTER EXPORT FOR THIS LATER
-//		PrintWriter pw = new PrintWriter(new File("input_sounding"));
-//
-//		pw.println(site + " - " + d);
-//		
-//		for (int i = pressure.length - 1; i >= 0; i--) {
-//			if (i == pressure.length - 1) {
-//				double theta = WeatherUtils.potentialTemperature(temperature[i], pressure[i]);
-//				double mixingRatio = WeatherUtils.mixingRatio(pressure[i], dewpoint[i]);
-//
-//				String s = String.format("%12.4f%12.4f%12.4f", pressure[i] / 100.0, theta, mixingRatio * 1000.0);
-//
-//				pw.println(s);
-//			} else {
-//				double theta = WeatherUtils.potentialTemperature(temperature[i], pressure[i]);
-//				double mixingRatio = WeatherUtils.mixingRatio(pressure[i], dewpoint[i]);
-//
-//				String s = String.format("%12.4f%12.4f%12.4f%12.4f%12.4f", height[i], theta,
-//						mixingRatio * 1000.0, uWind[i], vWind[i]);
-//
-//				pw.println(s);
-//			}
-//		}
-//
-//		pw.close();
 
 		for (int i = 0; i < lines.size(); i++) {
 			if (height[i] == -8888) {

@@ -1,5 +1,8 @@
 package com.ameliaWx.soundingViewer;
 
+import java.util.HashMap;
+import java.util.Set;
+
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class Sounding {
@@ -12,6 +15,8 @@ public class Sounding {
 	private double[] uWind;
 	private double[] vWind;
 	private double[] wWind;
+	
+	private HashMap<String, Object> metadata;
 
 	public Sounding(double[] pressureLevels, double[] temperature, double[] dewpoint, double[] height,
 			double[] uWind, double[] vWind) {
@@ -20,7 +25,9 @@ public class Sounding {
 	
 	public Sounding(double[] pressureLevels, double[] temperature, double[] dewpoint, double[] height,
 			double[] uWind, double[] vWind, double[] wWind) {
-//		System.out.println("entering constructor");
+//		System.out.println("entering double[] constructor");
+		this.metadata = new HashMap<>();
+		
 		this.pressureLevels = pressureLevels;
 		this.temperature = temperature;
 		this.dewpoint = dewpoint;
@@ -31,7 +38,10 @@ public class Sounding {
 		
 		wetbulb = new double[dewpoint.length];
 		
+//		System.out.println("wetbulb.length: " + wetbulb.length);
 		for(int i = 0; i < wetbulb.length; i++) {
+//			System.out.printf("%10.0f%10.2f%10.2f%10.2f%10.2f%10.2f", pressureLevels[i], height[i], temperature[i], dewpoint[i], uWind[i], vWind[i]);
+			
 			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
 		}
 		
@@ -50,6 +60,8 @@ public class Sounding {
 	
 	public Sounding(float[] pressureLevels, float[] temperature, float[] dewpoint, float[] height,
 			float[] uWind, float[] vWind, float[] wWind) {
+		this.metadata = new HashMap<>();
+		
 		this.pressureLevels = convFloatToDouble(pressureLevels);
 		this.temperature = convFloatToDouble(temperature);
 		this.dewpoint = convFloatToDouble(dewpoint);
@@ -116,5 +128,21 @@ public class Sounding {
 
 	public double[] getWWind() {
 		return wWind;
+	}
+	
+	public void addMetadata(String key, Object object) {
+		metadata.put(key, object);
+	}
+	
+	public Object getMetadata(String key) {
+		return metadata.get(key);
+	}
+	
+	public void removeMetadata(String key) {
+		metadata.remove(key);
+	}
+	
+	public Set<String> listMetadata() {
+		return metadata.keySet();
 	}
 }

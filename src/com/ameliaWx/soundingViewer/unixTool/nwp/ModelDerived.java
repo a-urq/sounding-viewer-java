@@ -26,9 +26,8 @@ public class ModelDerived {
 	private static final String gfsUrlInfix2 = "%2F";
 	private static final String gfsUrlForecastTemplate = "atmos&file=gfs.t%02dz.pgrb2.0p25.f%03d&var_HGT=on&var_PRES=on&var_RH=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_1000_mb=on&lev_975_mb=on&lev_950_mb=on&lev_925_mb=on&lev_900_mb=on&lev_850_mb=on&lev_800_mb=on&lev_750_mb=on&lev_700_mb=on&lev_650_mb=on&lev_600_mb=on&lev_550_mb=on&lev_500_mb=on&lev_450_mb=on&lev_400_mb=on&lev_350_mb=on&lev_300_mb=on&lev_250_mb=on&lev_200_mb=on&lev_150_mb=on&lev_100_mb=on&lev_70_mb=on&lev_50_mb=on&lev_40_mb=on&lev_30_mb=on&lev_20_mb=on&lev_15_mb=on&lev_10_mb=on&lev_7_mb=on&lev_5_mb=on&lev_3_mb=on&lev_2_mb=on&lev_1_mb=on&lev_0.7_mb=on&lev_0.4_mb=on&lev_0.2_mb=on&lev_0.1_mb=on&lev_0.07_mb=on&lev_0.04_mb=on&lev_0.02_mb=on&lev_0.01_mb=on&lev_surface=on&subregion=&toplat=%3.3f&leftlon=%3.3f&rightlon=%3.3f&bottomlat=%3.3f";
 
-	public static void main(String[] args) {
-		new SoundingFrame("GFS-derived Radiosonde", getGfsSounding(33, -96.5), DateTime.now(DateTimeZone.UTC), 33,
-				-96.5);
+	public static void main(String[] args) throws IOException {
+		new SoundingFrame("GFS-derived Radiosonde", getGfsSounding(-32.75, -55.5, new DateTime(2023, 11, 29, 18, 0, DateTimeZone.UTC), 51), new DateTime(2023, 11, 28, 12, 0, DateTimeZone.UTC).plusHours(81), -32.75, -55.5);
 		
 //		try {
 //			getGfsSounding(33, -96.5, new DateTime(2023, 11, 19, 18, 0, DateTimeZone.UTC), 0);

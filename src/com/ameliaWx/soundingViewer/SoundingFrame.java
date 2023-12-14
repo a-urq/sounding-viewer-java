@@ -24,16 +24,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -44,12 +46,61 @@ import com.ameliaWx.weatherUtils.ParcelPath;
 import com.ameliaWx.weatherUtils.PrecipitationType;
 import com.ameliaWx.weatherUtils.PtypeAlgorithms;
 import com.ameliaWx.weatherUtils.RecordAtLevel;
+import com.ameliaWx.weatherUtils.UnitConversions;
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class SoundingFrame extends JFrame {
-	// IMPLEMENT WHENEVER YOU HAVE TIME
 	private void outputAsCM1Sounding() {
 		// MAKE GUI DIRECTORY SELECTOR
+		
+		JFileChooser fc = new JFileChooser();
+//		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		int ret = fc.showSaveDialog(this);
+		
+		if(ret == JFileChooser.APPROVE_OPTION) {
+			File destination = fc.getSelectedFile();
+			
+			System.out.println(destination);
+			
+			PrintWriter pw = null;
+			try {
+				pw = new PrintWriter(destination);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return;
+			}
+	
+//			pw.println(site + " - " + d);
+			
+			double[] pressure = activeSounding.getPressureLevels();
+			double[] temperature = activeSounding.getTemperature();
+			double[] dewpoint = activeSounding.getDewpoint();
+			double[] height = activeSounding.getHeight();
+			double[] uWind = activeSounding.getUWind();
+			double[] vWind = activeSounding.getVWind();
+			
+			for (int i = pressure.length - 1; i >= 0; i--) {
+				if (i == pressure.length - 1) {
+					double theta = WeatherUtils.potentialTemperature(temperature[i], pressure[i]);
+					double mixingRatio = WeatherUtils.mixingRatio(pressure[i], dewpoint[i]);
+	
+					String s = String.format("%12.4f%12.4f%12.4f", pressure[i] / 100.0, theta, mixingRatio * 1000.0);
+	
+					pw.println(s);
+				} else {
+					double theta = WeatherUtils.potentialTemperature(temperature[i], pressure[i]);
+					double mixingRatio = WeatherUtils.mixingRatio(pressure[i], dewpoint[i]);
+	
+					String s = String.format("%12.4f%12.4f%12.4f%12.4f%12.4f", height[i], theta,
+							mixingRatio * 1000.0, uWind[i], vWind[i]);
+	
+					pw.println(s);
+				}
+			}
+	
+			pw.close();
+		}
 	}
 	
 	private static final long serialVersionUID = 396540838404275479L;
@@ -635,8 +686,6 @@ public class SoundingFrame extends JFrame {
 			}
 		}
 
-		this.setVisible(true);
-
 		if(sounding1 != null) {
 			activeReadoutSet = 0;
 			this.activeSounding = sounding0;
@@ -700,6 +749,10 @@ public class SoundingFrame extends JFrame {
 
 	public SoundingFrame(String soundingSource, Sounding soundingM) {
 		this(soundingSource, soundingM, null, -1024.0, -1024.0, 0, null);
+	}
+
+	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM) {
+		this(soundingSource, soundingM, timeM, -1024.0, -1024.0);
 	}
 
 	public SoundingFrame(String soundingSource, Sounding soundingM, DateTime timeM, double lat, double lon) {
@@ -914,6 +967,7 @@ public class SoundingFrame extends JFrame {
 			BufferedImage skewT = new BufferedImage((int) (800 * scale), (int) (800 * scale),
 					BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = skewT.createGraphics();
+			g.setFont(CAPTION_FONT);
 
 			double[] pressure = activeSounding.getPressureLevels();
 			double[] temperature = activeSounding.getTemperature();
@@ -1140,7 +1194,6 @@ public class SoundingFrame extends JFrame {
 
 			// effective inflow layer
 			if (inflowLayer[activeReadoutSet][0] != -1024.0) {
-				g.setFont(CAPTION_FONT);
 				g.setColor(new Color(128, 255, 255));
 
 				double btmInflowLayerPres = WeatherUtils.pressureAtHeight(pressure[pressure.length - 1],
@@ -1345,6 +1398,20 @@ public class SoundingFrame extends JFrame {
 					g.drawLine((int) (x1 * scale), (int) (yW * scale), (int) (x2 * scale), (int) (yW * scale));
 				}
 			}
+			
+			// surface labels
+			double y = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(pressure[dewpoint.length - 1])) + 10;
+			double xT = linScale(223.15, 323.15, 0, 800, temperature[dewpoint.length - 1]) + 10;
+			double xD = linScale(223.15, 323.15, 0, 800, dewpoint[dewpoint.length - 1]) - 10;
+			double skew = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y - 10);
+			
+			drawCenteredOutlinedString(
+					String.format("%dF", Math.round(UnitConversions.kelvinToFahrenheit(dewpoint[dewpoint.length - 1]))), 
+					g, (int) (scale * (xD + skew)), (int) (scale * y), new Color(0, 255, 0));
+			
+			drawCenteredOutlinedString(
+					String.format("%dF", Math.round(UnitConversions.kelvinToFahrenheit(temperature[dewpoint.length - 1]))), 
+					g, (int) (scale * (xT + skew)), (int) (scale * y), new Color(255, 0, 0));
 
 			return skewT;
 		}
@@ -1371,6 +1438,10 @@ public class SoundingFrame extends JFrame {
 			double tempAdvMax = 0.0;
 			
 			for(double i = 10000; i < 100000; i += THERMAL_WIND_DP) {
+				if(i < pressure[0]) {
+					continue;
+				}
+				
 				double upperLimitPres = i;
 				double lowerLimitPres = i + THERMAL_WIND_DP;
 
@@ -1785,8 +1856,10 @@ public class SoundingFrame extends JFrame {
 
 				double markerX = linScale(-maxRadius, maxRadius, 0, 400, markerE);
 				double markerY = linScale(-maxRadius, maxRadius, 0, 400, -markerN);
-
-				drawCenteredOutlinedString(labels[i], g, (int) (scale * markerX), (int) (scale * markerY), Color.WHITE);
+				
+				if(heights[i] < height[0]) {
+					drawCenteredOutlinedString(labels[i], g, (int) (scale * markerX), (int) (scale * markerY), Color.WHITE);
+				}
 			}
 
 			return hodograph;
@@ -2194,15 +2267,15 @@ public class SoundingFrame extends JFrame {
 			
 			g.setColor(new Color(192, 192, 192));
 			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, (int) (9 * scale)));
-//			double surfacePressure = activeSounding.getPressureLevels()[activeSounding.getPressureLevels().length - 1];
-//			double surfaceHeight = activeSounding.getHeight()[activeSounding.getHeight().length - 1];
-//			double meltingEnergy = PtypeAlgorithms.meltingEnergy(activeSounding.getPressureLevels(),
-//					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
-//					surfacePressure, surfaceHeight);
-//			double refreezingEnergy = PtypeAlgorithms.refreezingEnergy(activeSounding.getPressureLevels(),
-//					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
-//					surfacePressure, surfaceHeight);
-//			g.drawString(String.format("%04.0fM/%04.0fF", meltingEnergy, refreezingEnergy), (int) (5 * scale), (int) (85 * scale));
+			double surfacePressure = activeSounding.getPressureLevels()[activeSounding.getPressureLevels().length - 1];
+			double surfaceHeight = activeSounding.getHeight()[activeSounding.getHeight().length - 1];
+			double meltingEnergy = PtypeAlgorithms.meltingEnergy(activeSounding.getPressureLevels(),
+					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
+					surfacePressure, surfaceHeight);
+			double refreezingEnergy = PtypeAlgorithms.refreezingEnergy(activeSounding.getPressureLevels(),
+					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
+					surfacePressure, surfaceHeight);
+//			g.drawString(String.format("%06.1fM/%06.1fF", meltingEnergy, refreezingEnergy), (int) (5 * scale), (int) (85 * scale));
 
 			return winterReadouts;
 		}
@@ -2776,7 +2849,11 @@ public class SoundingFrame extends JFrame {
 				}
 				break;
 			case KeyEvent.VK_C:
-				openControlsPage();
+				if(e.isShiftDown()) {
+					outputAsCM1Sounding();
+				} else {
+					openControlsPage();
+				}
 				break;
 			case KeyEvent.VK_E:
 				showEntrainment = !showEntrainment;
@@ -3073,7 +3150,7 @@ public class SoundingFrame extends JFrame {
 
 		double corfidiUpshear = Math.hypot(corfidiUpshearVector[0], corfidiUpshearVector[1]);
 
-		if (stpE[activeReadoutSet] >= 3 && stpF[activeReadoutSet] >= 3 && srh0_1[activeReadoutSet] >= 200
+		if (mesocycloneSign * stpE[activeReadoutSet] >= 3 && mesocycloneSign * stpF[activeReadoutSet] >= 3 && srh0_1[activeReadoutSet] >= 200
 				&& srhInflow[activeReadoutSet] >= 200 && srw4_6 >= 15 * 0.5144444 && bwd0_8 >= 45 * 0.5144444
 				&& sbLcl[activeReadoutSet] < 1000 && mlLcl[activeReadoutSet] < 1200 && lapseRate0_1km >= 0.005
 				&& mlcinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
@@ -3082,14 +3159,14 @@ public class SoundingFrame extends JFrame {
 			} else {
 				return PDS_TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 3 || stpF[activeReadoutSet] >= 4) && mlcinh[activeReadoutSet] >= -125
+		} else if ((Math.abs(mesocycloneSign * stpE[activeReadoutSet]) >= 3 || Math.abs(mesocycloneSign * stpF[activeReadoutSet]) >= 4) && mlcinh[activeReadoutSet] >= -125
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
 				return DEV_TOR;
 			} else {
 				return TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1)
+		} else if ((Math.abs(mesocycloneSign * stpE[activeReadoutSet]) >= 1 || mesocycloneSign * stpF[activeReadoutSet] >= 1)
 				&& (srw4_6 >= 15 * 0.5144444 || bwd0_8 >= 40 * 0.5144444) && mlcinh[activeReadoutSet] >= -50
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
@@ -3097,7 +3174,7 @@ public class SoundingFrame extends JFrame {
 			} else {
 				return TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1) && (lowRH + midRH) / 2 >= 0.6
+		} else if ((mesocycloneSign * stpE[activeReadoutSet] >= 1 || mesocycloneSign * stpF[activeReadoutSet] >= 1) && (lowRH + midRH) / 2 >= 0.6
 				&& lapseRate0_1km >= 0.005 && mlcinh[activeReadoutSet] >= -50
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			if (Math.abs(devtor[activeReadoutSet]) >= 0.5) {
@@ -3105,15 +3182,15 @@ public class SoundingFrame extends JFrame {
 			} else {
 				return TOR;
 			}
-		} else if ((stpE[activeReadoutSet] >= 1 || stpF[activeReadoutSet] >= 1) && mlcinh[activeReadoutSet] >= -150
+		} else if ((mesocycloneSign * stpE[activeReadoutSet] >= 1 || mesocycloneSign * stpF[activeReadoutSet] >= 1) && mlcinh[activeReadoutSet] >= -150
 				&& inflowLayer[activeReadoutSet][0] >= 0) {
 			return MRGL_TOR;
-		} else if ((stpE[activeReadoutSet] >= 1 && srhInflow[activeReadoutSet] >= 150)
-				|| (stpF[activeReadoutSet] >= 0.5 && srh0_1[activeReadoutSet] >= 150)
+		} else if ((mesocycloneSign * stpE[activeReadoutSet] >= 1 && srhInflow[activeReadoutSet] >= 150)
+				|| (mesocycloneSign * stpF[activeReadoutSet] >= 0.5 && srh0_1[activeReadoutSet] >= 150)
 						&& mlcinh[activeReadoutSet] >= -50 && inflowLayer[activeReadoutSet][0] >= 0) {
 			return MRGL_TOR;
-		} else if ((stpF[activeReadoutSet] >= 1 || mesocycloneSign * scp[activeReadoutSet] >= 4
-				|| stpE[activeReadoutSet] >= 1) && mucinh[activeReadoutSet] >= -50) {
+		} else if ((mesocycloneSign * mesocycloneSign * stpF[activeReadoutSet] >= 1 || mesocycloneSign * scp[activeReadoutSet] >= 4
+				|| mesocycloneSign * mesocycloneSign * stpE[activeReadoutSet] >= 1) && mucinh[activeReadoutSet] >= -50) {
 			return SVR;
 		} else if (((mesocycloneSign * scp[activeReadoutSet] >= 2 && ship[activeReadoutSet] >= 1)
 				|| dcape[activeReadoutSet] >= 750) && mucinh[activeReadoutSet] >= -50) {
