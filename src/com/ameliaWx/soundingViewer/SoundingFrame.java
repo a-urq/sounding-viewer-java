@@ -46,6 +46,7 @@ import com.ameliaWx.weatherUtils.ParcelPath;
 import com.ameliaWx.weatherUtils.PrecipitationType;
 import com.ameliaWx.weatherUtils.PtypeAlgorithms;
 import com.ameliaWx.weatherUtils.RecordAtLevel;
+import com.ameliaWx.weatherUtils.StormMotion;
 import com.ameliaWx.weatherUtils.UnitConversions;
 import com.ameliaWx.weatherUtils.WeatherUtils;
 
@@ -80,8 +81,8 @@ public class SoundingFrame extends JFrame {
 			double[] uWind = activeSounding.getUWind();
 			double[] vWind = activeSounding.getVWind();
 			
-			for (int i = pressure.length - 1; i >= 0; i--) {
-				if (i == pressure.length - 1) {
+			for (int i = dewpoint.length - 1; i >= 0; i--) {
+				if (i == dewpoint.length - 1) {
 					double theta = WeatherUtils.potentialTemperature(temperature[i], pressure[i]);
 					double mixingRatio = WeatherUtils.mixingRatio(pressure[i], dewpoint[i]);
 	
@@ -121,9 +122,10 @@ public class SoundingFrame extends JFrame {
 
 	private double windOffsetAngle; // corrects for U and V not matching up with east and north, radians
 
-	private ParcelPath pathType = ParcelPath.INFLOW_LAYER;
+	private ParcelPath pathType = ParcelPath.MOST_UNSTABLE;
 	
 	private boolean showEntrainment = false;
+	private boolean pseudoadiabaticSwitch = false;
 	private boolean showFrostPoint = false;
 
 	private boolean parcelPathVisible = true;
@@ -392,29 +394,31 @@ public class SoundingFrame extends JFrame {
 					break;
 				}
 
-				parcelPathSurfaceBased[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.SURFACE_BASED, false);
-				parcelPathMixedLayer[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_100MB,
-						false);
-				parcelPathMostUnstable[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MOST_UNSTABLE, false);
-				parcelPathInflowLayer[i] = WeatherUtils.computeInflowLayerParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getHeight(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(),
-						false);
+				parcelPathSurfaceBased[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathMixedLayer[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathMostUnstable[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathInflowLayer[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
 
-				parcelPathSurfaceBasedEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.SURFACE_BASED, true);
-				parcelPathMixedLayerEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_100MB,
-						true);
-				parcelPathMostUnstableEntr[i] = WeatherUtils.computeParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MOST_UNSTABLE, true);
-				parcelPathInflowLayerEntr[i] = WeatherUtils.computeInflowLayerParcelPath(activeSounding.getPressureLevels(),
-						activeSounding.getHeight(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(),
-						true);
+				parcelPathSurfaceBasedEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathInflowLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathMixedLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathMostUnstableEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
 
 				parcelPathDowndraft[i] = WeatherUtils.computeDcapeParcelPath(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint());
@@ -483,14 +487,21 @@ public class SoundingFrame extends JFrame {
 				muMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
 
-				sbecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
-				ilecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
-				mlecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
-				muecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+//				sbecape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+//						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+
+				sbecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, StormMotion.BUNKERS_RIGHT, pseudoadiabaticSwitch);
+				ilecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, StormMotion.BUNKERS_RIGHT, pseudoadiabaticSwitch);
+				mlecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, StormMotion.BUNKERS_RIGHT, pseudoadiabaticSwitch);
+				muecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, StormMotion.BUNKERS_RIGHT, pseudoadiabaticSwitch);
 
 				sbecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
@@ -525,13 +536,13 @@ public class SoundingFrame extends JFrame {
 						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
 
 				sbEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i], sbecape[i]);
 				ilEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i], ilecape[i]);
 				mlEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i], mlecape[i]);
 				muEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i], muecape[i]);
 
 				dcape[i] = WeatherUtils.computeDcape(activeSounding.getPressureLevels(),
 						activeSounding.getTemperature(), activeSounding.getDewpoint());
@@ -604,9 +615,9 @@ public class SoundingFrame extends JFrame {
 						inflowLayer[i][0], inflowLayer[i][1]);
 
 				threeCapeSb[i] = WeatherUtils.computeThreeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.SURFACE_BASED);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
 				threeCapeMl[i] = WeatherUtils.computeThreeCape(activeSounding.getPressureLevels(),
-						activeSounding.getTemperature(), activeSounding.getDewpoint(), ParcelPath.MIXED_LAYER_100MB);
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 
 				double[] ebwdVec = WeatherUtils.effectiveBulkWindDifference(activeSounding.getPressureLevels(),
 						activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint(),
@@ -649,8 +660,11 @@ public class SoundingFrame extends JFrame {
 				double surfaceHeight = activeSounding.getHeight()[activeSounding.getHeight().length - 1];
 
 				double[] relativeHumidity = new double[activeSounding.getDewpoint().length];
+				double[] relativeHumidityWrtIce = new double[activeSounding.getDewpoint().length];
 				for (int z = 0; z < relativeHumidity.length; z++) {
 					relativeHumidity[z] = WeatherUtils.relativeHumidity(activeSounding.getTemperature()[z],
+							activeSounding.getDewpoint()[z]);
+					relativeHumidityWrtIce[z] = WeatherUtils.relativeHumidityWrtIceUsingDewpoint(activeSounding.getTemperature()[z],
 							activeSounding.getDewpoint()[z]);
 
 //					System.out.printf("%5.0f\t%5.1f\t%5.1f\t%4.1f\n", activeSounding.getHeight()[z] - surfaceHeight, 
@@ -664,7 +678,7 @@ public class SoundingFrame extends JFrame {
 						activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint());
 				dgzOmega[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(),
 						activeSounding.getWWind(), dgzLayer[i][0], dgzLayer[i][1]);
-				dgzRH[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(), relativeHumidity,
+				dgzRH[i] = WeatherUtils.averageParameterOverLayer(activeSounding.getHeight(), relativeHumidityWrtIce,
 						dgzLayer[i][0], dgzLayer[i][1]);
 
 				cantinBachand[i] = PtypeAlgorithms.cantinBachandMethod(activeSounding.getPressureLevels(),
@@ -733,6 +747,7 @@ public class SoundingFrame extends JFrame {
 
 	public SoundingFrame(String soundingSource, Sounding sounding0, DateTime time0, Sounding soundingM, DateTime timeM,
 			Sounding sounding1, DateTime time1, double lat, double lon, double windOffsetAngle, MapInset mapInset) {
+		this.soundingM = soundingM;
 	}
 
 	public SoundingFrame(Sounding soundingM) {
@@ -778,7 +793,11 @@ public class SoundingFrame extends JFrame {
 	private int stormMotionVector = 2; // 0 = LM, 1 = MW, 2 = RM
 	
 	public BufferedImage printChart(int width, int height, String text) {
-		System.out.println(sg);
+		if(sg == null) {
+			sg = new SoundingGraphics();
+			activeSounding = soundingM;
+		}
+		System.out.println("sg: " + sg);
 		BufferedImage chart = sg.drawSoundingChart(width, height);
 		
 		BufferedImage bg = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -909,7 +928,7 @@ public class SoundingFrame extends JFrame {
 				}
 				for (int i = -50; i <= 50; i += 10) {
 					int x = (int) linScale(-50, 50, 50 * scale, 850 * scale, i);
-					drawCenteredString(i + "C", g, x, (int) (860 * scale));
+					drawCenteredString(i + "°C", g, x, (int) (860 * scale));
 				}
 			}
 			
@@ -1112,6 +1131,8 @@ public class SoundingFrame extends JFrame {
 					parcelVirtualTemperature[i] = WeatherUtils.virtualTemperature(parcelTemperature[i],
 							parcelDewpoint[i], parcelPressure[i]);
 				}
+				
+				double accumuLengthVirtTempDown = 0.0;
 
 				g.setStroke(thinStroke);
 				for (int i = 0; i < parcelPressure.length - 1; i++) {
@@ -1124,9 +1145,15 @@ public class SoundingFrame extends JFrame {
 					double x1V = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
 					double x2V = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
 
-					g.setColor(new Color(255, 128, 255));
-					g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
-							(int) (y2 * scale));
+					double lengthVirtTempSegment = Math.hypot(((x1V + skew1) * scale) - ((x2V + skew2) * scale),
+							(y1 * scale) - (y2 * scale));
+					accumuLengthVirtTempDown += lengthVirtTempSegment;
+
+					if (accumuLengthVirtTempDown % 12 < 6) {
+						g.setColor(new Color(255, 128, 255));
+						g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
+								(int) (y2 * scale));
+					}
 				}
 			}
 
@@ -1158,12 +1185,12 @@ public class SoundingFrame extends JFrame {
 
 					if(showFrostPoint) {
 						g.setStroke(thickStroke);
-						g.setColor(new Color(0, 196, 128));
+						g.setColor(new Color(0, 196, 128, 150));
 						double x1F = linScale(223.15, 323.15, 0, 800, frostPoint[i]);
 						double x2F = linScale(223.15, 323.15, 0, 800, frostPoint[i + 1]);
 
 						drawDashedLine(g, (int) ((x1F + skew1) * scale), (int) (y1 * scale), (int) ((x2F + skew2) * scale),
-								(int) (y2 * scale), 10);
+								(int) (y2 * scale), 12);
 					}
 
 					g.setStroke(thickStroke);
@@ -1175,12 +1202,12 @@ public class SoundingFrame extends JFrame {
 							(int) (y2 * scale));
 
 					g.setStroke(thickStroke);
-					g.setColor(new Color(255, 0, 0));
+					g.setColor(new Color(255, 0, 0, 150));
 					double x1V = linScale(223.15, 323.15, 0, 800, virtTemp[i]);
 					double x2V = linScale(223.15, 323.15, 0, 800, virtTemp[i + 1]);
 
 					drawDashedLine(g, (int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
-							(int) (y2 * scale), 10);
+							(int) (y2 * scale), 12);
 				}
 
 				g.setStroke(thickStroke);
@@ -1271,29 +1298,27 @@ public class SoundingFrame extends JFrame {
 				double[] parcelDewpoint = new double[parcelPath.size()];
 				double[] parcelVirtualTemperature = new double[parcelPath.size()];
 
-//				System.out.println(parcelPath.size());
-//				System.out.println(parcelPathEntr.size());
+//				System.out.println("parcelPath.size(): " + parcelPath.size());
+//				System.out.println("parcelPathEntr.size(): " + parcelPathEntr.size());
 				
 				for (int i = 0; i < parcelPressureEntr.length; i++) {
 					parcelPressureEntr[i] = parcelPathEntr.get(i).getPressure();
 					parcelTemperatureEntr[i] = parcelPathEntr.get(i).getTemperature();
 					parcelDewpointEntr[i] = parcelPathEntr.get(i).getDewpoint();
-					parcelVirtualTemperatureEntr[i] = WeatherUtils.virtualTemperature(parcelTemperatureEntr[i],
-							parcelDewpointEntr[i], parcelPressureEntr[i]);
+					parcelVirtualTemperatureEntr[i] = parcelPathEntr.get(i).getDensityTemperature();
 				}
 				
 				for (int i = 0; i < parcelPressure.length; i++) {
 					parcelPressure[i] = parcelPath.get(i).getPressure();
 					parcelTemperature[i] = parcelPath.get(i).getTemperature();
 					parcelDewpoint[i] = parcelPath.get(i).getDewpoint();
-					parcelVirtualTemperature[i] = WeatherUtils.virtualTemperature(parcelTemperature[i],
-							parcelDewpoint[i], parcelPressure[i]);
+					parcelVirtualTemperature[i] = parcelPath.get(i).getDensityTemperature();
 				}
 
 				double accumuLengthVirtTempEntr = 0.0;
 				double accumuLengthVirtTemp = 0.0;
 
-				g.setStroke(thinStroke);
+				g.setStroke(thickStroke);
 				for (int i = 0; i < parcelPressureEntr.length - 1; i++) {
 					double y1 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressureEntr[i]));
 					double y2 = linScale(Math.log(10000), Math.log(110000), 0, 800, Math.log(parcelPressureEntr[i + 1]));
@@ -1307,18 +1332,18 @@ public class SoundingFrame extends JFrame {
 							(y1 * scale) - (y2 * scale));
 					accumuLengthVirtTempEntr += lengthVirtTempSegment;
 
-					if (accumuLengthVirtTempEntr % 8 < 4) {
-						g.setColor(new Color(150, 96, 32));
+					if (accumuLengthVirtTempEntr % 12 < 6) {
+						g.setColor(new Color(128, 128, 128, 128));
 						g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
 								(int) (y2 * scale));
 					}
 
-					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i]);
-					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i + 1]);
-
-					g.setColor(new Color(150, 96, 32));
-					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
-							(int) (y2 * scale));
+//					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i]);
+//					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperatureEntr[i + 1]);
+//
+//					g.setColor(new Color(128, 128, 128, 128));
+//					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+//							(int) (y2 * scale));
 				}
 				
 				for (int i = 0; i < parcelPressure.length - 1; i++) {
@@ -1334,18 +1359,18 @@ public class SoundingFrame extends JFrame {
 							(y1 * scale) - (y2 * scale));
 					accumuLengthVirtTemp += lengthVirtTempSegment;
 
-					if (accumuLengthVirtTemp % 8 < 4) {
-						g.setColor(new Color(255, 255, 255));
+					if (accumuLengthVirtTemp % 12 < 6) {
+						g.setColor(new Color(255, 32, 32));
 						g.drawLine((int) ((x1V + skew1) * scale), (int) (y1 * scale), (int) ((x2V + skew2) * scale),
 								(int) (y2 * scale));
 					}
 
-					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
-					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
-
-					g.setColor(new Color(255, 255, 255));
-					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
-							(int) (y2 * scale));
+//					double x1T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i]);
+//					double x2T = linScale(223.15, 323.15, 0, 800, parcelTemperature[i + 1]);
+//
+//					g.setColor(new Color(255, 32, 32));
+//					g.drawLine((int) ((x1T + skew1) * scale), (int) (y1 * scale), (int) ((x2T + skew2) * scale),
+//							(int) (y2 * scale));
 				}
 			}
 
@@ -1406,11 +1431,11 @@ public class SoundingFrame extends JFrame {
 			double skew = linScale(0, 800, 800 * SKEW_AMOUNT, 0, y - 10);
 			
 			drawCenteredOutlinedString(
-					String.format("%dF", Math.round(UnitConversions.kelvinToFahrenheit(dewpoint[dewpoint.length - 1]))), 
+					String.format("%d°F", Math.round(UnitConversions.kelvinToFahrenheit(dewpoint[dewpoint.length - 1]))), 
 					g, (int) (scale * (xD + skew)), (int) (scale * y), new Color(0, 255, 0));
 			
 			drawCenteredOutlinedString(
-					String.format("%dF", Math.round(UnitConversions.kelvinToFahrenheit(temperature[dewpoint.length - 1]))), 
+					String.format("%d°F", Math.round(UnitConversions.kelvinToFahrenheit(temperature[dewpoint.length - 1]))), 
 					g, (int) (scale * (xT + skew)), (int) (scale * y), new Color(255, 0, 0));
 
 			return skewT;
@@ -1893,9 +1918,9 @@ public class SoundingFrame extends JFrame {
 						(int) (45 * scale), (int) (45 * scale));
 	
 				String sbLcl_ = String.format("%5.2f", sbELcl[activeReadoutSet] / 1000.0);
-				String ilLcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilELcl[activeReadoutSet] + inflowLayer[activeReadoutSet][0]) / 1000.0) : "-";
+				String ilLcl_ = (inflowLayer[activeReadoutSet][0] > -999) ? String.format("%5.2f", (ilELcl[activeReadoutSet]) / 1000.0) : "-";
 				String mlLcl_ = String.format("%5.2f", mlELcl[activeReadoutSet] / 1000.0);
-				String muLcl_ = String.format("%5.2f", (muELcl[activeReadoutSet] + muLpl[activeReadoutSet]) / 1000.0);
+				String muLcl_ = String.format("%5.2f", (muELcl[activeReadoutSet]) / 1000.0);
 	
 				g.drawString(String.format("%-9s%-9s%-9s%-9s%-9s", "LCL [km]", sbLcl_, mlLcl_, muLcl_, ilLcl_),
 						(int) (45 * scale), (int) (60 * scale));
@@ -2863,8 +2888,16 @@ public class SoundingFrame extends JFrame {
 				showFrostPoint = !showFrostPoint;
 				sg.repaint();
 				break;
+			case KeyEvent.VK_I:
+				switchAscentType();
+				sg.repaint();
+				break;
 			case KeyEvent.VK_P:
 				selectParcelPathType();
+				sg.repaint();
+				break;
+			case KeyEvent.VK_Q:
+				activeSounding.printForPython();
 				sg.repaint();
 				break;
 			case KeyEvent.VK_S:
@@ -2941,15 +2974,18 @@ public class SoundingFrame extends JFrame {
 
 				double[] stormMotion = WeatherUtils.stormMotionBunkersIDRightMoving(activeSounding.getPressureLevels(),
 						activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
-
+				StormMotion stormMotionType = StormMotion.BUNKERS_RIGHT;
+				
 				switch (stormMotionVector) {
 				case 0:
 					stormMotion = WeatherUtils.stormMotionBunkersIDLeftMoving(activeSounding.getPressureLevels(),
 							activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.BUNKERS_LEFT;
 					break;
 				case 1:
 					stormMotion = WeatherUtils.stormMotionBunkersIDMeanWindComponent(activeSounding.getPressureLevels(),
 							activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.MEAN_WIND;
 					break;
 				case 2:
 					break;
@@ -2957,11 +2993,13 @@ public class SoundingFrame extends JFrame {
 					stormMotion = WeatherUtils.corfidiUpshear(activeSounding.getPressureLevels(),
 							activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint(),
 							activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.CORFIDI_UPSHEAR;
 					break;
 				case 4:
 					stormMotion = WeatherUtils.corfidiDownshear(activeSounding.getPressureLevels(),
 							activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint(),
 							activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.CORFIDI_DOWNSHEAR;
 					break;
 				case 5:
 					break;
@@ -3032,6 +3070,296 @@ public class SoundingFrame extends JFrame {
 						WeatherUtils.deviantTornadoMotion(activeSounding.getPressureLevels(),
 								activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind(),
 								stormMotion));
+
+				parcelPathSurfaceBasedEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, stormMotionType, true, pseudoadiabaticSwitch);
+				parcelPathInflowLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, stormMotionType, true, pseudoadiabaticSwitch);
+				parcelPathMixedLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, stormMotionType, true, pseudoadiabaticSwitch);
+				parcelPathMostUnstableEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, stormMotionType, true, pseudoadiabaticSwitch);
+
+
+				sbecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, stormMotionType, pseudoadiabaticSwitch);
+				ilecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, stormMotionType, pseudoadiabaticSwitch);
+				mlecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, stormMotionType, pseudoadiabaticSwitch);
+				muecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, stormMotionType, pseudoadiabaticSwitch);
+
+				sbecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathSurfaceBasedEntr[i]);
+				ilELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathInflowLayerEntr[i]);
+				mlELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayerEntr[i]);
+				muELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstableEntr[i]);
+
+				sbELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i], sbecape[i]);
+				ilEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i], ilecape[i]);
+				mlEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i], mlecape[i]);
+				muEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i], muecape[i]);
+			}
+
+			if(sounding1 != null) {
+				activeReadoutSet = 0;
+				this.activeSounding = sounding0;
+				hazType[0] = determineHazType();
+		
+				activeReadoutSet = 2;
+				this.activeSounding = sounding1;
+				hazType[2] = determineHazType();
+			}
+
+			activeReadoutSet = 1;
+			this.activeSounding = soundingM;
+			hazType[1] = determineHazType();
+		}
+	}
+
+	private void switchAscentType() {
+		int confirm = JOptionPane.showConfirmDialog(this, "Would you like to switch the parcel ascent type? These computation may take a little while to complete.", "Switch ascent parcels?", JOptionPane.YES_NO_OPTION);
+
+		if(confirm != 0) {
+			return;
+		}
+		
+		pseudoadiabaticSwitch = !pseudoadiabaticSwitch;
+		
+		for (int i = 0; i < 3; i++) {
+			if (i == 1 || sounding1 != null) {
+				Sounding activeSounding = null;
+
+				switch (i) {
+				case 0:
+					activeSounding = sounding0;
+					break;
+				case 1:
+					activeSounding = soundingM;
+					break;
+				case 2:
+					activeSounding = sounding1;
+					break;
+				}
+
+				double[] stormMotion = WeatherUtils.stormMotionBunkersIDRightMoving(activeSounding.getPressureLevels(),
+						activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
+				StormMotion stormMotionType = StormMotion.BUNKERS_RIGHT;
+				
+				switch (stormMotionVector) {
+				case 0:
+					stormMotion = WeatherUtils.stormMotionBunkersIDLeftMoving(activeSounding.getPressureLevels(),
+							activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.BUNKERS_LEFT;
+					break;
+				case 1:
+					stormMotion = WeatherUtils.stormMotionBunkersIDMeanWindComponent(activeSounding.getPressureLevels(),
+							activeSounding.getHeight(), activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.MEAN_WIND;
+					break;
+				case 2:
+					break;
+				case 3:
+					stormMotion = WeatherUtils.corfidiUpshear(activeSounding.getPressureLevels(),
+							activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint(),
+							activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.CORFIDI_UPSHEAR;
+					break;
+				case 4:
+					stormMotion = WeatherUtils.corfidiDownshear(activeSounding.getPressureLevels(),
+							activeSounding.getHeight(), activeSounding.getTemperature(), activeSounding.getDewpoint(),
+							activeSounding.getUWind(), activeSounding.getVWind());
+					stormMotionType = StormMotion.CORFIDI_DOWNSHEAR;
+					break;
+				case 5:
+					break;
+				}
+
+				parcelPathSurfaceBased[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathMixedLayer[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathMostUnstable[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+				parcelPathInflowLayer[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, StormMotion.BUNKERS_RIGHT, false, pseudoadiabaticSwitch);
+
+				parcelPathSurfaceBasedEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathInflowLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathMixedLayerEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+				parcelPathMostUnstableEntr[i] = WeatherUtils.computeEcapeParcelPath(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, StormMotion.BUNKERS_RIGHT, true, pseudoadiabaticSwitch);
+
+				double[] sbParcelPressure = new double[parcelPathSurfaceBased[i].size()];
+				double[] sbParcelHeight = new double[parcelPathSurfaceBased[i].size()];
+				double muLplPressure = parcelPathMostUnstable[i].get(0).getPressure();
+
+				for (int j = 0; j < sbParcelPressure.length; j++) {
+					sbParcelPressure[sbParcelPressure.length - 1 - j] = parcelPathSurfaceBased[i].get(j).getPressure();
+					sbParcelHeight[sbParcelPressure.length - 1 - j] = parcelPathSurfaceBased[i].get(j).getHeight();
+				}
+
+				muLpl[activeReadoutSet] = logInterp(sbParcelPressure, sbParcelHeight, muLplPressure);
+
+				sbcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				mlcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				mucape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilcape[i] = WeatherUtils.computeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+
+				sbcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				mlcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				mucinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilcinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+
+				sbLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathSurfaceBased[i]);
+				ilLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathInflowLayer[i]);
+				mlLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayer[i]);
+				muLcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstable[i]);
+
+				sbLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				mlLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				muLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+				ilLfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+
+				sbEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				ilEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+				mlEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				muEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+
+				sbMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				ilMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayer[i]);
+				mlMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
+				muMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstable[i]);
+
+
+				sbecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.SURFACE_BASED, stormMotionType, pseudoadiabaticSwitch);
+				ilecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.INFLOW_LAYER, stormMotionType, pseudoadiabaticSwitch);
+				mlecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MIXED_LAYER_100MB, stormMotionType, pseudoadiabaticSwitch);
+				muecape[i] = WeatherUtils.computeEcape(activeSounding.getPressureLevels(), activeSounding.getHeight(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getUWind(),
+						activeSounding.getVWind(), ParcelPath.MOST_UNSTABLE, stormMotionType, pseudoadiabaticSwitch);
+
+				sbecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muecinh[i] = WeatherUtils.computeCinh(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathSurfaceBasedEntr[i]);
+				ilELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathInflowLayerEntr[i]);
+				mlELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMixedLayerEntr[i]);
+				muELcl[i] = WeatherUtils.liftedCondensationLevel(parcelPathMostUnstableEntr[i]);
+
+				sbELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muELfc[i] = WeatherUtils.levelOfFreeConvection(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i]);
+				ilEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i]);
+				mlEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i]);
+				muEEl[i] = WeatherUtils.equilibriumLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i]);
+
+				sbEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBasedEntr[i], sbecape[i]);
+				ilEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathInflowLayerEntr[i], ilecape[i]);
+				mlEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayerEntr[i], mlecape[i]);
+				muEMpl[i] = WeatherUtils.maximumParcelLevel(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMostUnstableEntr[i], muecape[i]);
+
+				threeCapeSb[i] = WeatherUtils.computeThreeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathSurfaceBased[i]);
+				threeCapeMl[i] = WeatherUtils.computeThreeCape(activeSounding.getPressureLevels(),
+						activeSounding.getTemperature(), activeSounding.getDewpoint(), parcelPathMixedLayer[i]);
 			}
 
 			if(sounding1 != null) {

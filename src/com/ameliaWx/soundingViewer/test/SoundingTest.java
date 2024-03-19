@@ -23,7 +23,7 @@ import com.ameliaWx.weatherUtils.WeatherUtils;
 
 public class SoundingTest {
 	public static void main(String[] args) throws FileNotFoundException {
-		testAcars();
+		testSounding();
 	}
 
 	private static void testSounding() throws FileNotFoundException {
@@ -34,7 +34,9 @@ public class SoundingTest {
 			e.printStackTrace();
 		}
 
-		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023022703-OUN.txt");
+//		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023022703-OUN.txt");
+//		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2023041919-OUN.txt");
+		File sounding = new File("src/com/ameliaWx/soundingViewer/test/soundingData_2013053118-OUN.txt");
 		Scanner sc = new Scanner(sounding);
 
 		ArrayList<String> lines = new ArrayList<>();
@@ -88,13 +90,13 @@ public class SoundingTest {
 		}
 
 		Sounding soundingObj = new Sounding(pressure, temperature, dewpoint, height, uWind, vWind);
-		DateTime time = new DateTime(2023, 2, 27, 3, 0, DateTimeZone.UTC);
+		DateTime time = new DateTime(2013, 5, 31, 18, 0, DateTimeZone.UTC);
 
 		new SoundingFrame("Norman OK Weather Balloon", soundingObj, time, 35.1808, -97.4378).setVisible(true);
 	}
 
 	private static void testAcars() {
-		File acars = new File("src/com/ameliaWx/soundingViewer/test/ACARS_20231214_ICT_1020.txt");
+		File acars = new File("src/com/ameliaWx/soundingViewer/test/ACARS_20231214_ABQ_1030.txt");
 		
 		Sounding s = null;
 		try {

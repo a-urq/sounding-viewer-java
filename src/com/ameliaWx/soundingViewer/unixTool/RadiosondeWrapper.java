@@ -46,9 +46,9 @@ public class RadiosondeWrapper {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(UnitConversions.kelvinToFahrenheit(WeatherUtils.dewpoint(UnitConversions.fahrenheitToKelvin(66), 0.31)) + "F");
-		
-		System.exit(0);
+//		System.out.println(UnitConversions.kelvinToFahrenheit(WeatherUtils.dewpoint(UnitConversions.fahrenheitToKelvin(66), 0.31)) + "F");
+//		
+//		System.exit(0);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -75,7 +75,7 @@ public class RadiosondeWrapper {
 
 //		displayCurrentSounding(RadiosondeSite.findSite("KCRP"));
 
-//		args = new String[] { "-h", "-s", "KOUN", "-d", "20230227-03" };
+//		args = new String[] { "-h", "-s", "KMPX", "-d", "20190719-21" };
 //		args = new String[] { "-c", "-s", "KOUN"};
 
 		if (args.length == 0) {
@@ -129,7 +129,7 @@ public class RadiosondeWrapper {
 				init.dispose();
 				
 				new SoundingFrame(site.locationString() + " GFS-Derived", gfs, DateTime.now(DateTimeZone.UTC), 33,
-						-96.5);
+						-96.5).setVisible(true);
 				
 //				try {
 //					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
@@ -362,7 +362,7 @@ public class RadiosondeWrapper {
 			DateTime d = (DateTime) soundingRet[1];
 
 			new SoundingFrame(site.locationString() + " Radiosonde", sounding, d, site.getLatitude(),
-					site.getLongitude());
+					site.getLongitude()).setVisible(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -397,7 +397,7 @@ public class RadiosondeWrapper {
 
 			loading.dispose();
 			new SoundingFrame(site.locationString() + " Radiosonde", sounding, d, site.getLatitude(),
-					site.getLongitude());
+					site.getLongitude()).setVisible(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

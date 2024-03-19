@@ -1,5 +1,7 @@
 package com.ameliaWx.soundingViewer;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -145,4 +147,40 @@ public class Sounding {
 	public Set<String> listMetadata() {
 		return metadata.keySet();
 	}
+	
+	public void printForPython() {
+		double[] p = pressureLevels.clone();
+		double[] T = temperature.clone();
+		double[] Td = dewpoint.clone();
+		double[] z = height.clone();
+		double[] u = uWind.clone();
+		double[] v = vWind.clone();
+		
+		reverse(p);
+		reverse(T);
+		reverse(Td);
+		reverse(z);
+		reverse(u);
+		reverse(v);
+		
+		System.out.println(p.length);
+		System.out.println("clean_data['p'] = " + Arrays.toString(p) + " * units(\"Pa\")");
+		System.out.println("clean_data['T'] = " + Arrays.toString(T) + " * units(\"degK\")");
+		System.out.println("clean_data['Td'] = " + Arrays.toString(Td) + " * units(\"degK\")");
+		System.out.println("clean_data['z'] = " + Arrays.toString(z) + " * units(\"m\")");
+		System.out.println("clean_data['u'] = " + Arrays.toString(u) + " * units(\"m/s\")");
+		System.out.println("clean_data['v'] = " + Arrays.toString(v) + " * units(\"m/s\")");
+	}
+	
+	private static void reverse(double[] a) {
+		int n = a.length;
+		
+        int i;
+        double t; 
+        for (i = 0; i < n / 2; i++) { 
+            t = a[i]; 
+            a[i] = a[n - i - 1]; 
+            a[n - i - 1] = t; 
+        } 
+    }
 }
