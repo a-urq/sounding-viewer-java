@@ -1,7 +1,7 @@
 # sounding-viewer-java
 A Java program that visualizes a vertical profile of the atmosphere as a skew-T diagram, a hodograph, and a set of readouts such as CAPE, storm-relative helicity, and wind shear. Exists both as a standalone program and as an API. 
 
-!! Program now features irreversible adiabatic and entraining parcels. Press I while looking at a sounding to switch between irreversible adiabatic and psuedoadiabatic ascent and E to toggle entrainment !!
+!! Program now features irreversible adiabatic and entraining parcels. Press I while looking at a sounding to switch between irreversible adiabatic and psuedoadiabatic ascent and E to toggle entrainment. !!
 
 To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.4.0.
 
