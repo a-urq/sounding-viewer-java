@@ -3157,11 +3157,11 @@ public class SoundingFrame extends JFrame {
 	}
 
 	private void switchAscentType() {
-		int confirm = JOptionPane.showConfirmDialog(this, "Would you like to switch the parcel ascent type? These computation may take a little while to complete.", "Switch ascent parcels?", JOptionPane.YES_NO_OPTION);
-
-		if(confirm != 0) {
-			return;
-		}
+//		int confirm = JOptionPane.showConfirmDialog(this, "Would you like to switch the parcel ascent type? These computation may take a little while to complete.", "Switch ascent parcels?", JOptionPane.YES_NO_OPTION);
+//
+//		if(confirm != 0) {
+//			return;
+//		}
 		
 		pseudoadiabaticSwitch = !pseudoadiabaticSwitch;
 		
