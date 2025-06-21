@@ -46,6 +46,9 @@ public class Sounding {
 			
 			wetbulb[i] = WeatherUtils.wetBulbTemperature(temperature[i], dewpoint[i], pressureLevels[i]);
 		}
+
+//		this.temperature = wetbulb;
+//		this.dewpoint = wetbulb;
 		
 		frostPoint = new double[dewpoint.length];
 

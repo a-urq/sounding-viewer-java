@@ -18,6 +18,8 @@ import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
+import static com.ameliaWx.soundingViewer.GlobalVars.dataFolder;
+
 public class ModelDerived {
 	private static final String gfsUrlPrefix = "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25_1hr.pl?dir=%2Fgfs.";
 	private static final String gfsUrlDateTemplate = "%04d%02d%02d";
@@ -201,11 +203,11 @@ public class ModelDerived {
 	private static File downloadFile(String url, String fileName) throws IOException {
 		URL dataURL = new URL(url);
 
-		File dataDir = new File(SoundingFrame.dataFolder);
+		File dataDir = new File(dataFolder);
 		dataDir.mkdirs();
 		InputStream is = dataURL.openStream();
 
-		OutputStream os = new FileOutputStream(SoundingFrame.dataFolder + fileName);
+		OutputStream os = new FileOutputStream(dataFolder + fileName);
 		byte[] buffer = new byte[16 * 1024];
 		int transferredBytes = is.read(buffer);
 		while (transferredBytes > -1) {
@@ -215,6 +217,6 @@ public class ModelDerived {
 		is.close();
 		os.close();
 
-		return new File(SoundingFrame.dataFolder + fileName);
+		return new File(dataFolder + fileName);
 	}
 }

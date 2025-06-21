@@ -223,6 +223,7 @@ GSD_ID name wmoid  lat     lon   elev(m) Description
 0258 EBBR   6451   50.90    4.53   58 Brussels National Apt, BX
 0937 EBCI      0   50.60    4.50  187 Charleroi
 1403  EBL      0   41.30    2.10    3 Barcelona
+0000  ECP      0   30.35  -85.80   21 NW Florida Beaches Int'l Airport, FL
 0938 EDDC      0   51.10   13.80  230 Dresden
 0528 EDDF  10637   50.05    8.60  113 Frankfurt Main, DL
 0940 EDDG      0   52.10    7.70   48 Munster/Osnabruck, DL

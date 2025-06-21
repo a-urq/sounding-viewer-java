@@ -42,11 +42,15 @@
             </tr>
             <tr>
                 <td>E</td>
-                <td>Toggles whether parcels and convective readouts consider entrainment. Entrainment is an approximation of <a href="https://arxiv.org/pdf/2301.04712.pdf">Peters et. al. 2023</a>, but not exactly what the paper describes.</td>
+                <td>Toggles whether parcels and convective readouts consider entrainment. On by default. Entrainment CAPE is computed according to <a href="https://journals.ametsoc.org/view/journals/atsc/aop/JAS-D-23-0003.1/JAS-D-23-0003.1.xml">Peters et al. 2023</a>.</td>
             </tr>
             <tr>
                 <td>F</td>
                 <td>Toggles whether the frost point trace (dashed line, bluish-green) is shown. Off by default. Computed according to formula in <a href="https://journals.ametsoc.org/view/journals/mwre/116/11/1520-0493_1988_116_2172_tswrpa_2_0_co_2.xml?tab_body=pdf">Huffman and Norman 1988, Appendix B</a>.</td>
+            </tr>
+            <tr>
+                <td>I</td>
+                <td>Toggles whether parcels and convective readouts use irreversible adiabatic ascent. On by default. Irreversible adiabatic ascent accounts for the effects of precipitation loading. According to <a href="https://journals.ametsoc.org/view/journals/atsc/79/3/JAS-D-21-0118.1.xml">Peters et al. 2022</a>, irreversible adiabatic ascent produces a more accurate estimation of CAPE and is therefore recommended.</td>
             </tr>
             <tr>
                 <td>P</td>

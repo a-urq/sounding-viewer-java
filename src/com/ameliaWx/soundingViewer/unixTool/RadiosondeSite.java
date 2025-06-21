@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -19,9 +18,13 @@ import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class RadiosondeSite implements Comparable<RadiosondeSite> {
-	public static String dataFolder = System.getProperty("user.home") + "/Documents/SoundingViewer/data/";
+import javax.swing.*;
 
+import static com.ameliaWx.soundingViewer.GlobalVars.cacheFolder;
+import static com.ameliaWx.soundingViewer.GlobalVars.dataFolder;
+import static com.ameliaWx.soundingViewer.dataSources.FileTools.downloadFileToCache;
+
+public class RadiosondeSite implements Comparable<RadiosondeSite> {
 	public static ArrayList<RadiosondeSite> sites = new ArrayList<>();
 
 	private String internationalCode;
@@ -71,16 +74,86 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 
 	private static String[][] countryListArr = null;
 	private static String[][] usStatesArr = null;
-	
+
+	public static void loadSitesFromCache() {
+        File stationList = new File(cacheFolder + "igra2-station-list.txt");
+        File countryList = new File(cacheFolder + "igra2-country-list.txt");
+        File usStatesList = new File(cacheFolder + "igra2-us-states.txt");
+
+		if(!stationList.exists() || !countryList.exists() || !usStatesList.exists()) {
+			JFrame init = new JFrame("Performing first-time setup, this may take a few seconds...");
+			init.setSize(500, 0);
+			init.setLocationRelativeTo(null);
+			init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			init.setVisible(true);
+
+			initializeSites();
+
+			init.dispose();
+		}
+
+        File caProvinces = loadResourceAsFile("res/caProvinces.txt");
+        File fourLetterCodes = loadResourceAsFile("res/fourLetterCodes.txt");
+
+        String[][] stationListArr = parseFixedWidth(stationList, 11, 9, 10, 7, 4, 30, 5, 6, 5);
+        usStatesArr = parseFixedWidth(usStatesList, 2, 40);
+        countryListArr = parseFixedWidth(countryList, 2, 40);
+        String[][] fourLetterCodesArr = parseFixedWidth(fourLetterCodes, 11, 40);
+
+        HashMap<String, String> usStatesMap = arrToHashMap(usStatesArr);
+        HashMap<String, String> countryListMap = arrToHashMap(countryListArr);
+        HashMap<String, String> fourLetterCodesMap = arrToHashMap(fourLetterCodesArr);
+
+        sites = new ArrayList<>();
+
+        for (String[] line : stationListArr) {
+//				System.out.println(Arrays.toString(line));
+//				System.out.println(sites.size());
+
+            String internationalCode = line[0];
+            double latitude = Double.parseDouble(line[1]);
+            double longitude = Double.parseDouble(line[2]);
+            double elevation = Double.parseDouble(line[3]);
+            String state = usStatesMap.get(line[4]);
+            String country = countryListMap.get(line[0].substring(0, 2));
+            String city = line[5];
+            int startYear = Integer.parseInt(line[6]);
+            int endYear = Integer.parseInt(line[7]);
+            int numRecords = Integer.parseInt(line[8]);
+
+            if(state == null) {
+                state = "";
+            }
+
+            if ("Canada".equals(country)) {
+                // province assignments
+            }
+
+            String fourLetterCode = "";
+            if ("United States".equals(country)) {
+                if(fourLetterCodesMap.containsKey(internationalCode)) {
+                    fourLetterCode = fourLetterCodesMap.get(internationalCode);
+                }
+            }
+
+            RadiosondeSite site = new RadiosondeSite(internationalCode, fourLetterCode, latitude, longitude, elevation, country, state,
+                    city, startYear, endYear, numRecords);
+
+            sites.add(site);
+        }
+
+        Collections.sort(sites);
+    }
+
 	private static void initializeSites() {
 		try {
-			File stationList = downloadFile(
+			File stationList = downloadFileToCache(
 					"https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-station-list.txt",
 					"igra2-station-list.txt");
-			File countryList = downloadFile(
+			File countryList = downloadFileToCache(
 					"https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-country-list.txt",
 					"igra2-country-list.txt");
-			File usStatesList = downloadFile(
+			File usStatesList = downloadFileToCache(
 					"https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-us-states.txt",
 					"igra2-us-states.txt");
 			
@@ -103,15 +176,15 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 //				System.out.println(sites.size());
 
 				String internationalCode = line[0];
-				double latitude = Double.valueOf(line[1]);
-				double longitude = Double.valueOf(line[2]);
-				double elevation = Double.valueOf(line[3]);
+				double latitude = Double.parseDouble(line[1]);
+				double longitude = Double.parseDouble(line[2]);
+				double elevation = Double.parseDouble(line[3]);
 				String state = usStatesMap.get(line[4]);
 				String country = countryListMap.get(line[0].substring(0, 2));
 				String city = line[5];
-				int startYear = Integer.valueOf(line[6]);
-				int endYear = Integer.valueOf(line[7]);
-				int numRecords = Integer.valueOf(line[8]);
+				int startYear = Integer.parseInt(line[6]);
+				int endYear = Integer.parseInt(line[7]);
+				int numRecords = Integer.parseInt(line[8]);
 				
 				if(state == null) {
 					state = "";
@@ -135,10 +208,6 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 			}
 			
 			Collections.sort(sites);
-			
-			stationList.delete();
-			countryList.delete();
-			usStatesList.delete();
 		} catch (IOException e) {
 			System.err.println("Unable to download files from IGRA-2 archive.");
 			e.printStackTrace();
@@ -338,7 +407,7 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 
 		// System.out.println("Temp-file created.");
 
-		File file = new File(RadiosondeSite.dataFolder + "temp/" + urlStr + "");
+		File file = new File(dataFolder + "temp/" + urlStr + "");
 		file.deleteOnExit();
 
 		if (tilesObj == null) {
