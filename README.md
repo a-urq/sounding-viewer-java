@@ -3,7 +3,7 @@ A Java program that visualizes a vertical profile of the atmosphere as a skew-T 
 
 !! Program now features irreversible adiabatic and entraining parcels. Press I while looking at a sounding to switch between irreversible adiabatic and psuedoadiabatic ascent and E to toggle entrainment. !!
 
-To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.4.0.
+To download, follow instructions at https://github.com/a-urq/sounding-viewer-java/releases/tag/v1.5.1.
 
 Be advised that integration with IGRA2 soundings from outside of the US is currently not well tested and has had issues in the past. Please let me know if you encounter any issues.
 
