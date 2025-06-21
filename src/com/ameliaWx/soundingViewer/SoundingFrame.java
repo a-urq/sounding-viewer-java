@@ -2731,7 +2731,7 @@ public class SoundingFrame extends JFrame {
 			double refreezingEnergy = PtypeAlgorithms.refreezingEnergy(activeSounding.getPressureLevels(),
 					activeSounding.getTemperature(), activeSounding.getDewpoint(), activeSounding.getHeight(),
 					surfacePressure, surfaceHeight);
-			g.drawString(String.format("%06.1fM/%06.1fF", meltingEnergy, refreezingEnergy), (int) (5 * scale), (int) (85 * scale));
+//			g.drawString(String.format("%06.1fM/%06.1fF", meltingEnergy, refreezingEnergy), (int) (5 * scale), (int) (85 * scale));
 
 			return winterReadouts;
 		}

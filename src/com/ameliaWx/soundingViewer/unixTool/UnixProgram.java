@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
@@ -26,7 +25,7 @@ import com.ameliaWx.soundingViewer.Sounding;
 import com.ameliaWx.soundingViewer.SoundingFrame;
 import com.ameliaWx.soundingViewer.unixTool.nwp.ModelDerived;
 
-public class RadiosondeWrapper {
+public class UnixProgram {
 
 	public static void main(String[] args) {
 //		System.out.println(UnitConversions.kelvinToFahrenheit(WeatherUtils.dewpoint(UnitConversions.fahrenheitToKelvin(66), 0.31)) + "F");
@@ -110,7 +109,7 @@ public class RadiosondeWrapper {
 			System.out.println("FOUR LETTER CODE: " + site.getFourLetterCode());
 
 			if (site.getFourLetterCode().length() > 0) {
-				RadiosondeWrapper.displayCurrentSounding(site);
+				UnixProgram.displayCurrentSounding(site);
 			} else {
 				JFrame init = new JFrame("Getting GFS data, this may take a few seconds...");
 				init.setSize(500, 0);
@@ -126,7 +125,7 @@ public class RadiosondeWrapper {
 						-96.5).setVisible(true);
 				
 //				try {
-//					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
+//					UnixProgram.displaySounding(site, DateTime.now(DateTimeZone.UTC));
 //				} catch (RadiosondeNotFoundException e) {
 //					e.printStackTrace();
 //					System.exit(0);
@@ -357,10 +356,10 @@ public class RadiosondeWrapper {
 			}
 
 			if (site.getFourLetterCode().length() > 0) {
-				RadiosondeWrapper.displayCurrentSounding(site);
+				UnixProgram.displayCurrentSounding(site);
 			} else {
 				try {
-					RadiosondeWrapper.displaySounding(site, DateTime.now(DateTimeZone.UTC));
+					UnixProgram.displaySounding(site, DateTime.now(DateTimeZone.UTC));
 				} catch (RadiosondeNotFoundException e) {
 					e.printStackTrace();
 					System.exit(0);
@@ -410,7 +409,7 @@ public class RadiosondeWrapper {
 
 			try {
 
-				RadiosondeWrapper.displaySounding(site, d);
+				UnixProgram.displaySounding(site, d);
 			} catch (RadiosondeNotFoundException e) {
 				e.printStackTrace();
 				System.exit(0);

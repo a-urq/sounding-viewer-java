@@ -155,7 +155,21 @@ public class Acars {
             queryHour = queryHour.plusHours(1);
         }
 
+        acarsFileList = reverseSortMap(acarsFileList);
         return acarsFileList;
+    }
+
+    // Generic method to sort map in Java by the reverse ordering of its keys
+    public static TreeMap<String, String> reverseSortMap(Map<String, String> map)
+    {
+        TreeMap<String, String> treeMap = new TreeMap<>(new Comparator<String>() {
+            @Override
+            public int compare(String a, String b) {
+                return b.compareTo(a);
+            }
+        });
+        treeMap.putAll(map);
+        return treeMap;
     }
 
     public static Sounding readAcarsFile(File f) throws FileNotFoundException {
