@@ -591,6 +591,7 @@ GSD_ID name wmoid  lat     lon   elev(m) Description
 0382  MAA  43279   13.00   80.18   16 Madras, India
 0880  MAD  41216   24.43   54.46    5 Bateen, UAE
 2566 MARI  13026   46.50   15.70  265 Maribor, Slovenia
+0000  MAF      0   31.94 -102.20  875 Midland, TX
 0206  MBS      0   43.53  -84.08  204 Tri-City/Saginaw, MI
 2857  MCG  70231   62.97 -155.62  103 MCGRATH, AK
 0091  MCI  72446   39.32  -94.72  312 Kansas City Intl, MO

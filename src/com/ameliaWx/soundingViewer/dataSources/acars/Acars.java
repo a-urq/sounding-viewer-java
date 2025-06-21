@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class Acars {
     public static TreeMap<String, String> getAcarsFilesByDayAndHour(DateTime d) throws IOException {
@@ -38,7 +36,10 @@ public class Acars {
             String timeCode = link.substring(4, 8);
 
             AcarsStation station = AcarsStations.acarsStationFromCode(stationCode);
-            System.out.println(stationCode);
+            if(station == null) {
+                System.err.println("Station \"" + stationCode + "\" not found in ACARS key! Please tell Amelia about this so she can manually update the key.");
+            }
+            assert station != null;
             String stationName = station.location;
             String timeString = timeCode.substring(0, 2) + ":" + timeCode.substring(2, 4) + "Z";
 
@@ -113,7 +114,7 @@ public class Acars {
         DateTime queryHour = now.minusHours(searchbackHours);
 
         TreeMap<String, String> acarsFileList = new TreeMap<>();
-        while(queryHour.isBefore(now)) {
+        while(!queryHour.isAfter(now)) {
             String url = String.format("https://sharp.weather.ou.edu/soundings/acars/%04d/%02d/%02d/%02d/",
                     queryHour.getYear(), queryHour.getMonthOfYear(), queryHour.getDayOfMonth(), queryHour.getHourOfDay());
 
@@ -162,12 +163,7 @@ public class Acars {
     // Generic method to sort map in Java by the reverse ordering of its keys
     public static TreeMap<String, String> reverseSortMap(Map<String, String> map)
     {
-        TreeMap<String, String> treeMap = new TreeMap<>(new Comparator<String>() {
-            @Override
-            public int compare(String a, String b) {
-                return b.compareTo(a);
-            }
-        });
+        TreeMap<String, String> treeMap = new TreeMap<>(Comparator.reverseOrder());
         treeMap.putAll(map);
         return treeMap;
     }
@@ -196,12 +192,12 @@ public class Acars {
                 String[] tokens = line.split(",");
 
                 double[] record = new double[6];
-                record[0] = Double.valueOf(tokens[0].trim());
-                record[1] = Double.valueOf(tokens[1].trim());
-                record[2] = Double.valueOf(tokens[2].trim());
-                record[3] = Double.valueOf(tokens[3].trim());
-                record[4] = Double.valueOf(tokens[4].trim());
-                record[5] = Double.valueOf(tokens[5].trim());
+                record[0] = Double.parseDouble(tokens[0].trim());
+                record[1] = Double.parseDouble(tokens[1].trim());
+                record[2] = Double.parseDouble(tokens[2].trim());
+                record[3] = Double.parseDouble(tokens[3].trim());
+                record[4] = Double.parseDouble(tokens[4].trim());
+                record[5] = Double.parseDouble(tokens[5].trim());
 //				System.out.println(Arrays.toString(record));
 
                 if(record[0] > -1000.0) {
@@ -277,11 +273,11 @@ public class Acars {
         // FOR DIFFERENT CENTURIES THIS CODE WILL NEED TO BE ADJUSTED
         final int CENTURY = 2000;
 
-        int year = CENTURY + Integer.valueOf(timestamp.substring(0, 2));
-        int month = Integer.valueOf(timestamp.substring(2, 4));
-        int day = Integer.valueOf(timestamp.substring(4, 6));
-        int hour = Integer.valueOf(timestamp.substring(7, 9));
-        int minute = Integer.valueOf(timestamp.substring(9, 11));
+        int year = CENTURY + Integer.parseInt(timestamp.substring(0, 2));
+        int month = Integer.parseInt(timestamp.substring(2, 4));
+        int day = Integer.parseInt(timestamp.substring(4, 6));
+        int hour = Integer.parseInt(timestamp.substring(7, 9));
+        int minute = Integer.parseInt(timestamp.substring(9, 11));
 
         DateTime dt = new DateTime(year, month, day, hour, minute, DateTimeZone.UTC);
 
