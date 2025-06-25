@@ -1,18 +1,9 @@
 package com.ameliaWx.soundingViewer.unixTool;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -54,9 +45,9 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 		this.numRecords = numRecords;
 	}
 
-	static {
-		initializeSites();
-	}
+//	static {
+//		initializeSites();
+//	}
 	
 	public static void init() {
 		initializeSites();
@@ -75,13 +66,41 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 	private static String[][] countryListArr = null;
 	private static String[][] usStatesArr = null;
 
+	private static final int CACHE_UPDATE_FREQUENCY = 28; // units: days
 	public static void loadSitesFromCache() {
+		File lastDateUpdated = new File(cacheFolder + "last-date-updated.txt");
         File stationList = new File(cacheFolder + "igra2-station-list.txt");
         File countryList = new File(cacheFolder + "igra2-country-list.txt");
         File usStatesList = new File(cacheFolder + "igra2-us-states.txt");
 
-		if(!stationList.exists() || !countryList.exists() || !usStatesList.exists()) {
+		if(!stationList.exists() || !countryList.exists() || !usStatesList.exists() || !lastDateUpdated.exists()) {
 			JFrame init = new JFrame("Performing first-time setup, this may take a few seconds...");
+			init.setSize(500, 0);
+			init.setLocationRelativeTo(null);
+			init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			init.setVisible(true);
+
+			initializeSites();
+
+			init.dispose();
+		}
+
+		DateTime ldu;
+		DateTime now = DateTime.now();
+        try (Scanner lduSc = new Scanner(lastDateUpdated)) {
+            String lduStr = lduSc.nextLine();
+
+			int year = Integer.parseInt(lduStr.substring(0, 4));
+			int month = Integer.parseInt(lduStr.substring(5, 7));
+			int day = Integer.parseInt(lduStr.substring(8, 10));
+
+			ldu = new DateTime(year, month, day, 0, 0);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+		if(ldu.isBefore(now.minusDays(CACHE_UPDATE_FREQUENCY))) {
+			JFrame init = new JFrame("Updating cache, this may take a few seconds...");
 			init.setSize(500, 0);
 			init.setLocationRelativeTo(null);
 			init.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -107,10 +126,15 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
         sites = new ArrayList<>();
 
         for (String[] line : stationListArr) {
-//				System.out.println(Arrays.toString(line));
-//				System.out.println(sites.size());
+//			System.out.println(Arrays.toString(line));
+//			System.out.println(sites.size());
 
             String internationalCode = line[0];
+
+			if(internationalCode.isEmpty()) {
+				continue;
+			}
+
             double latitude = Double.parseDouble(line[1]);
             double longitude = Double.parseDouble(line[2]);
             double elevation = Double.parseDouble(line[3]);
@@ -156,6 +180,12 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 			File usStatesList = downloadFileToCache(
 					"https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/doc/igra2-us-states.txt",
 					"igra2-us-states.txt");
+
+			File lastDateUpdated = new File(cacheFolder + "last-date-updated.txt");
+			try (PrintWriter lduPw = new PrintWriter(lastDateUpdated)) {
+				DateTime time = DateTime.now();
+				lduPw.printf("%04d-%02d-%02d", time.getYear(), time.getMonthOfYear(), time.getDayOfMonth());
+			}
 			
 			File caProvinces = loadResourceAsFile("res/caProvinces.txt");
 			File fourLetterCodes = loadResourceAsFile("res/fourLetterCodes.txt");
@@ -176,6 +206,11 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 //				System.out.println(sites.size());
 
 				String internationalCode = line[0];
+
+				if(internationalCode.isEmpty()) {
+					continue;
+				}
+
 				double latitude = Double.parseDouble(line[1]);
 				double longitude = Double.parseDouble(line[2]);
 				double elevation = Double.parseDouble(line[3]);
