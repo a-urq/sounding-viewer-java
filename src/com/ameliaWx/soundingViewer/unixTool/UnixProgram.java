@@ -232,22 +232,66 @@ public class UnixProgram {
 				0, JOptionPane.DEFAULT_OPTION, null, new String[] { "Most Recent from Station", "Day + Hour", "Day + Station" }, 0);
 
 		TreeMap<String, String> fileList = null;
+		String station;
+		DateTime d;
+		JFrame notice;
+
 		switch (acarsSearchOption) {
 			case 0:
-				String station = acarsStationSelectionGui();
+				station = acarsStationSelectionGui();
 
-				try {
-					fileList = Acars.getRecentAcarsFilesByStation(station);
-                } catch (IOException e) {
-					JOptionPane.showMessageDialog(null, "ACARS file list could not be read.");
-                }
+				boolean foundAcars = false;
+				final int FILES_NEEDED_TO_FIND = 3;
+				int searchInterval = 24; // hours
+
+				while(!foundAcars) {
+					try {
+						notice = new JFrame("Getting ACARS files from " + station + " for the past " + searchInterval + " hours. This may take a few seconds..."); // GIVE THIS DIALOG BOX TO THE OTHER BRANCHES
+						notice.setSize(500, 0);
+						notice.setLocationRelativeTo(null);
+						notice.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						notice.setVisible(true);
+
+						fileList = Acars.getRecentAcarsFilesByStation(station, searchInterval); // IF NOTHING FOUND HERE, MAKE ITS SEARCH INTERVAL 24H LONGER UNTIL IT FINDS AT LEAST THREE
+
+						notice.dispose();
+
+						if(fileList.size() < FILES_NEEDED_TO_FIND) {
+							searchInterval += 24;
+
+							if(searchInterval > 120) {
+								break;
+							}
+						} else {
+							foundAcars = true;
+						}
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(null, "ACARS file list could not be read.");
+					}
+				}
+
+				if(!foundAcars) {
+					JOptionPane.showMessageDialog(null, "No ACARS files found for station " + station + ".");
+
+					return;
+				}
 
                 break;
 			case 1:
-				DateTime d = selectDateGui();
+				d = selectDateGui();
 
 				try {
+					String dateStr = String.format("%04d-%02d-%02d %02dZ", d.getYear(), d.getMonthOfYear(), d.getDayOfMonth(), d.getHourOfDay());
+
+					notice = new JFrame("Getting ACARS files for " + dateStr + ". This may take a few seconds..."); // GIVE THIS DIALOG BOX TO THE OTHER BRANCHES
+					notice.setSize(500, 0);
+					notice.setLocationRelativeTo(null);
+					notice.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					notice.setVisible(true);
+
 					fileList = Acars.getAcarsFilesByDayAndHour(d);
+
+					notice.dispose();
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "ACARS file list could not be read.");
 				}
@@ -263,6 +307,12 @@ public class UnixProgram {
 				station = acarsStationSelectionGui();
 
 				try {
+					notice = new JFrame("Getting ACARS files for " + dateStr + " from " + station + ". This may take a few seconds..."); // GIVE THIS DIALOG BOX TO THE OTHER BRANCHES
+					notice.setSize(500, 0);
+					notice.setLocationRelativeTo(null);
+					notice.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					notice.setVisible(true);
+
 					fileList = Acars.getAcarsFilesByDayAndStation(d, station);
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "ACARS file list could not be read.");
@@ -271,15 +321,14 @@ public class UnixProgram {
 				break;
 		}
 
-		String selectedFile = acarsFileSelectionGui(fileList);
+        assert fileList != null;
+        String selectedFile = acarsFileSelectionGui(fileList);
 		displayAcarsSounding(selectedFile);
 	}
 
 	// Made to be expandable later if user isn't familiar with relevant ACARS codes.
 	private static String acarsStationSelectionGui() {
-		String station = JOptionPane.showInputDialog(null, "Input an ACARS station code (Ex. \"DAL\", \"OKC\")");
-
-		return station;
+        return JOptionPane.showInputDialog(null, "Input an ACARS station code (Ex. \"DAL\", \"OKC\")");
 	}
 
 	// Complicated so should be reused.

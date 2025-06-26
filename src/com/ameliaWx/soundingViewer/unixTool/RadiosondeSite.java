@@ -150,6 +150,7 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
             }
 
             if ("Canada".equals(country)) {
+				System.out.println(city);
                 // province assignments
             }
 
@@ -159,6 +160,11 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
                     fourLetterCode = fourLetterCodesMap.get(internationalCode);
                 }
             }
+
+			if(city.contains(";")){
+				int indSemicolon = city.indexOf(';');
+				city = city.substring(0, indSemicolon);
+			}
 
             RadiosondeSite site = new RadiosondeSite(internationalCode, fourLetterCode, latitude, longitude, elevation, country, state,
                     city, startYear, endYear, numRecords);
