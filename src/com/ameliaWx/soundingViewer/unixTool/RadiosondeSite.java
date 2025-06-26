@@ -65,6 +65,7 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 
 	private static String[][] countryListArr = null;
 	private static String[][] usStatesArr = null;
+	private static String[][] caProvincesArr = null;
 
 	private static final int CACHE_UPDATE_FREQUENCY = 28; // units: days
 	public static void loadSitesFromCache() {
@@ -117,11 +118,13 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
         String[][] stationListArr = parseFixedWidth(stationList, 11, 9, 10, 7, 4, 30, 5, 6, 5);
         usStatesArr = parseFixedWidth(usStatesList, 2, 40);
         countryListArr = parseFixedWidth(countryList, 2, 40);
+		caProvincesArr = parseFixedWidth(caProvinces, 4, 40);
         String[][] fourLetterCodesArr = parseFixedWidth(fourLetterCodes, 11, 40);
 
         HashMap<String, String> usStatesMap = arrToHashMap(usStatesArr);
         HashMap<String, String> countryListMap = arrToHashMap(countryListArr);
         HashMap<String, String> fourLetterCodesMap = arrToHashMap(fourLetterCodesArr);
+		HashMap<String, String> caProvincesMap = arrToHashMap(caProvincesArr);
 
         sites = new ArrayList<>();
 
@@ -150,8 +153,29 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
             }
 
             if ("Canada".equals(country)) {
-				System.out.println(city);
+				int indSemicolon = city.indexOf(';');
+				int indParenthesis = city.indexOf('(');
+				String provinceCodeTry1 = city.substring(indSemicolon + 1).trim();
+				String provinceCodeTry2 = city.substring(indParenthesis + 1, city.length() - 1).trim();
+
+				String provinceCode = null;
+
+				if(!city.equals(provinceCodeTry1)) {
+					provinceCode = provinceCodeTry1;
+				} else if(!city.substring(0, city.length() - 1).equals(provinceCodeTry2)) {
+					provinceCode = provinceCodeTry2;
+				}
+
                 // province assignments
+				state = caProvincesMap.get(provinceCode);
+
+				if(provinceCode == null || state == null) {
+					if("GOOSE A".equals(city.trim())) {
+						state = "NEWFOUNDLAND & LABRADOR";
+					} else {
+						state = "UNKNOWN PROVINCE";
+					}
+				}
             }
 
             String fourLetterCode = "";
@@ -331,7 +355,7 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 		HashMap<String, String> ret = new HashMap<>();
 
 		for (String[] line : arr) {
-			ret.put(line[0], line[1]);
+			ret.put(line[0].trim(), line[1].trim());
 		}
 
 		return ret;
@@ -385,19 +409,38 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 		String[] countries = new String[countryListArr.length];
 		
 		countries[0] = "United States";
+		countries[1] = "Canada";
 		
 		boolean detectedUS = false;
+		boolean detectedCA = false;
 		
 		for(int i = 0; i < countries.length; i++) {
-			if(detectedUS) {
+			if(detectedUS && detectedCA) {
 				countries[i] = countryListArr[i][1];
+			} else if(detectedUS || detectedCA) {
+				if("United States".equals(countryListArr[i][1])) {
+					detectedUS = true;
+					continue;
+				}
+
+				if("Canada".equals(countryListArr[i][1])) {
+					detectedCA = true;
+					continue;
+				}
+
+				countries[i + 1] = countryListArr[i][1];
 			} else {
 				if("United States".equals(countryListArr[i][1])) {
 					detectedUS = true;
 					continue;
 				}
+
+				if("Canada".equals(countryListArr[i][1])) {
+					detectedCA = true;
+					continue;
+				}
 					
-				countries[i + 1] = countryListArr[i][1];
+				countries[i + 2] = countryListArr[i][1];
 			}
 		}
 		
@@ -412,6 +455,26 @@ public class RadiosondeSite implements Comparable<RadiosondeSite> {
 		}
 		
 		return states;
+	}
+
+	public static String[] getCaProvinces() {
+		ArrayList<String> caProvincesList = new ArrayList<>();
+
+        for (String[] codeAndProvince : caProvincesArr) {
+            String province = codeAndProvince[1];
+
+            if (!caProvincesList.contains(province)) {
+                caProvincesList.add(province);
+            }
+        }
+
+		String[] caProvinces = new String[caProvincesList.size()];
+
+		for(int i = 0; i < caProvinces.length; i++) {
+			caProvinces[i] = caProvincesList.get(i);
+		}
+
+		return caProvinces;
 	}
 	
 	public static RadiosondeSite[] getSitesInRegion(String country, String state, boolean current) {

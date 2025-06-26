@@ -182,6 +182,14 @@ public class UnixProgram {
 			System.out.println(chosenState);
 		}
 
+		if ("Canada".equals(chosenCountry)) {
+			chosenState = (String) JOptionPane.showInputDialog(null, "In what province/territory is the site you want to use?",
+					"IGRA2/SPC-EXPER Radiosonde Viewer", JOptionPane.QUESTION_MESSAGE, null,
+					RadiosondeSite.getCaProvinces(), RadiosondeSite.getCaProvinces()[0]);
+
+			System.out.println(chosenState);
+		}
+
 		RadiosondeSite[] sites = RadiosondeSite.getSitesInRegion(chosenCountry, chosenState, current);
 
 		String[] siteNames = new String[sites.length];
